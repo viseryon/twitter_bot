@@ -11,7 +11,27 @@ def get_gov_bonds():
     gov_bonds.drop(['Unnamed: 0_level_1', 'Unnamed: 4_level_1'],
                    axis=1, inplace=True)
 
-    gov_bonds.Country = gov_bonds.Country.str.replace('[ (*)]', '')
+    gov_bonds.Country = gov_bonds.Country.str.replace('[ (*)]', '', regex=True)
+
+    gov_bonds['S%P'] = gov_bonds['S%P'].astype('category')
+
+    gov_bonds.Yield = gov_bonds.Yield.str.replace('%', '', regex=True)
+    gov_bonds.Yield = gov_bonds.Yield.astype(float).round(3)
+
+    gov_bonds.Rate = gov_bonds.Rate.str.replace('%', '', regex=True)
+    gov_bonds.Rate = gov_bonds.Rate.astype(float).round(2)
+
+    gov_bonds.Bund = gov_bonds.Bund.str.replace(' bp', '', regex=True)
+    gov_bonds.Bund = gov_bonds.Bund.astype(float).round(1)
+
+    gov_bonds['T-Note'] = gov_bonds['T-Note'].str.replace(
+        ' bp', '', regex=True)
+    gov_bonds['T-Note'] = gov_bonds['T-Note'].astype(float).round(1)
+
+    gov_bonds.columns = ['Country', 'S&P',
+                         'Yield_(%)', 'Rate_(%)', 'Bund_(bp)', 'TNote_(bp)']
+
+    gov_bonds.set_index('Country', inplace=True)
 
     return gov_bonds
 
@@ -45,6 +65,7 @@ def get_sov_cds():
 
     return cds
 
+
 def foo():
 
     link = 'http://www.worldgovernmentbonds.com/central-bank-rates/'
@@ -54,8 +75,6 @@ def foo():
 
     # td = dt.today()
     # calendar.monthrange(td.year, td.month)
-
-
 
 
 def get_news():

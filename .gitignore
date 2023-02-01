@@ -1,8 +1,10 @@
 /makro_bot/testy.ipynb
+/makro_bot/__pycache__
 /makro_bot/testy2.ipynb
 /makro_bot/testy3.ipynb
 /makro_bot/POMYSLY.txt
 /wig_bot/chart.ipynb
+/wig_bot/__pycache__
 /wig_bot/keys.txt
 /wig_bot/rozne.py
 /wig_bot/POMYSLY.txt
@@ -15,3 +17,5 @@
 /POMYSLY.txt
 /keys.txt
 keys.txt
+__pycache__
+/__pycache__

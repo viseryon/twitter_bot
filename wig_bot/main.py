@@ -1,9 +1,10 @@
-import wig20_options
-import analysts_pts
-import analyst_rec
-import twitter
+from . import wig20_options
+from . import analysts_pts
+from . import analyst_rec
+from . import twitter
+from . import dni_opcje
+
 import os
-import dni_opcje
 import numpy as np
 from datetime import timedelta, datetime as dt
 
