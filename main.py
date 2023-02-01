@@ -1,4 +1,4 @@
-from wig_bot import main_na_serwer as wig_main
+from wig_bot import main as wig_main
 from makro_bot import main as makro_main
 
 def main():
