@@ -13,7 +13,7 @@ def get_gov_bonds():
 
     gov_bonds.Country = gov_bonds.Country.str.replace('[ (*)]', '', regex=True)
 
-    gov_bonds['S%P'] = gov_bonds['S%P'].astype('category')
+    gov_bonds['S&P'] = gov_bonds['S&P'].astype('category')
 
     gov_bonds.Yield = gov_bonds.Yield.str.replace('%', '', regex=True)
     gov_bonds.Yield = gov_bonds.Yield.astype(float).round(3)
