@@ -8,20 +8,7 @@ import numpy as np
 from datetime import timedelta, datetime as dt
 
 
-def tweet_charts(text, charts):
-
-    client, api = twitter.au()
-    print('auth completed')
-    twitter.tweet_things(client, api, text=text, obrazki=charts)
-
-
-def tweet_only_text(text):
-    client, api = twitter.au()
-    print('auth completed')
-    twitter.tweet_things(client, api, text=text)
-
-
-def posting_option_charts():
+def posting_option_charts(client, api):
     print('starting posting_option_charts')
 
     wig20_options.do_charts()
@@ -39,7 +26,7 @@ def posting_option_charts():
 
 #GPW #WIG20 #WIG #options #opcje #giełda #python #project'''
 
-    tweet_charts(text, to_post)
+    twitter.tweet_things(client, api, text, to_post)
 
     for chart in charts:
         os.remove(chart)
@@ -47,7 +34,7 @@ def posting_option_charts():
     print('wig20_option charts removed')
 
 
-def posting_analyst_pts():
+def posting_analyst_pts(client, api):
     print('starting posting_analyst_pts')
     wig20_40_comps = analysts_pts.wig20_40_components()
 
@@ -89,7 +76,7 @@ source: yfinance
 #GPW #WIG{indxx} #WIG #{ticker} #giełda #akcje #python #project"""
 
             print(text)
-            tweet_charts(text, [f'{ticker}_pts.png'])
+            twitter.tweet_things(client, api, text, [f'{ticker}_pts.png'])
 
             print('analyst_pts chart tweeted')
 
@@ -107,7 +94,7 @@ source: yfinance
     do_chart()
 
 
-def main():
+def main(client, api):
 
     td = dt.today()
     tmr = td + timedelta(1)
@@ -115,20 +102,20 @@ def main():
     # kazdego sprawdzaj rekomendacje
     analyst_recs = analyst_rec.analyst_recomendations()
     if analyst_recs:
-        tweet_only_text(text=analyst_recs)
+        twitter.tweet_things(client, api, text=analyst_rec)
     else:
         print('dzis bez postowania rekomendacji')
 
 
     # kazdego dnia postuj opcje
     if dni_opcje.is_good_day_to_post_option_charts():
-        posting_option_charts()
+        posting_option_charts(client, api)
     else:
         print('dzis bez postowania opcji')
 
     # w poniedzialki postuj analyst pts
     if td.isoweekday() == 1:
-        posting_analyst_pts()
+        posting_analyst_pts(client, api)
     else:
         print('dzis bez postowania pts')
 
@@ -136,5 +123,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
     pass
