@@ -103,7 +103,7 @@ def main(client, api):
     # kazdego sprawdzaj rekomendacje
     analyst_recs = analyst_rec.analyst_recomendations()
     if analyst_recs:
-        twitter.tweet_things(client, api, text=analyst_rec)
+        twitter.tweet_things(client, api, text=analyst_recs)
     else:
         print('dzis bez postowania rekomendacji')
 
