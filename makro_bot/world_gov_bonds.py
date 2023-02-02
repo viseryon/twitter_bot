@@ -2,8 +2,6 @@ import pandas as pd
 from datetime import timedelta, datetime as dt
 import requests
 from bs4 import BeautifulSoup
-import calendar
-
 
 def get_gov_bonds():
     gov_bonds = pd.read_html('http://www.worldgovernmentbonds.com/')[1]
@@ -11,7 +9,8 @@ def get_gov_bonds():
     gov_bonds.drop(['Unnamed: 0_level_1', 'Unnamed: 4_level_1'],
                    axis=1, inplace=True)
 
-    gov_bonds.Country = gov_bonds.Country.str.replace('[ (*)]', '', regex=True)
+    gov_bonds.Country = gov_bonds.Country.str.replace('[(*)]', '', regex=True)
+    gov_bonds.Country = gov_bonds.Country.str.rstrip(' ')
 
     gov_bonds['S&P'] = gov_bonds['S&P'].astype('category')
 
