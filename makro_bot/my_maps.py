@@ -13,14 +13,25 @@ def get_europe_df() -> gpd.GeoDataFrame:
     return europe_df
 
 
-def get_world_df() -> gpd.GeoDataFrame:
+def get_world_df(region: str = 'World') -> gpd.GeoDataFrame:
 
-    world = 'mapy/World_Countries.shp'
+    world = 'makro_bot/World_Countries.shp'
     world_df = gpd.read_file(world)
     world_df.columns = ['Country', 'geometry']
     world_df.set_index('Country', inplace=True)
 
-    return world_df
+    countries = pd.read_csv('makro_bot/country_continent.csv')
+    countries.set_index('Country', inplace=True)
+    region = region.lower().title()
+
+    if region == 'Europe':
+        return get_europe_df()
+
+    elif region != 'World':
+        countries = countries[countries.continent == region]
+
+    merged_df = world_df.join(countries)
+    return merged_df
 
 
 def combine_df_with_map(df: pd.DataFrame, mapa: str = 'world') -> gpd.GeoDataFrame:
@@ -35,3 +46,8 @@ def combine_df_with_map(df: pd.DataFrame, mapa: str = 'world') -> gpd.GeoDataFra
     merged_df = map_df.join(df, how='right')
 
     return merged_df
+
+
+if __name__ == '__main__':
+    df = get_world_df()
+    print(df.columns)

@@ -1,4 +1,5 @@
-# from . import blabla
+from . import my_maps
+
 
 def main(client, api):
     pass
