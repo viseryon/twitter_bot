@@ -23,7 +23,7 @@ def main():
 
     client, api = autoryzacja()
 
-    wig_main.main(client, api)
+    # wig_main.main(client, api)
 
     makro_main.main(client, api)
 
