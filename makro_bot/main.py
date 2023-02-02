@@ -1,5 +1,5 @@
-import world_gov_bonds
-import my_maps
+from . import world_gov_bonds
+from . import my_maps
 import matplotlib.pyplot as plt
 import pandas as pd
 import geopandas as gpd
@@ -7,7 +7,8 @@ import geopandas as gpd
 
 def chart_yields():
     df = world_gov_bonds.get_gov_bonds()
-    ready_df, background_df = my_maps.combine_df_with_map(df, 'europe', russia=False, only_independent=False)
+    ready_df, background_df = my_maps.combine_df_with_map(
+        df, 'europe', russia=False, only_independent=False)
 
     fig, ax = plt.subplots()
     backgournd = background_df.plot(ax=ax, color='grey')
@@ -18,8 +19,8 @@ def chart_yields():
 
 
 def main(client, api):
-    chart_yields()
-
+    # chart_yields()
+    pass
 
 if __name__ == '__main__':
     main(1, 1)
