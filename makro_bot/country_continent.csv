@@ -1,253 +1,253 @@
-Country,continent
-Afghanistan,Asia
-Albania,Europe
-Algeria,Africa
-American Samoa (US),Oceania
-American Virgin Islands (US),North America
-Andorra,Europe
-Angola,Africa
-Anguilla (UK),North America
-Antarctica,Antarctica
-Antigua and Barbuda,North America
-Argentina,South America
-Armenia,Asia
-Aruba (Netherlands),South America
-Australia,Oceania
-Austria,Europe
-Azerbaijan,Asia
-Bahamas,North America
-Bahrain,Asia
-Baker Island (US),Oceania
-Bangladesh,Asia
-Barbados,North America
-Belarus,Europe
-Belgium,Europe
-Belize,North America
-Benin,Africa
-Bermuda (UK),North America
-Bhutan,Asia
-Bolivia,South America
-Bonaire (Netherlands),North America
-Bosnia and Herzegovina,Europe
-Botswana,Africa
-Bouvet Island (Norway),Antarctica
-Brazil,South America
-British Indian Ocean Territory (UK),Asia
-British Virgin Islands (UK),North America
-Brunei,Asia
-Bulgaria,Europe
-Burkina Faso,Africa
-Burundi,Africa
-Cambodia,Asia
-Cameroon,Africa
-Canada,North America
-Cape Verde,Africa
-Cayman Islands (UK),North America
-Central African Republic,Africa
-Chad,Africa
-Chile,South America
-China,Asia
-Christmas Island (Australia),Asia
-Cocos (Keeling) Islands (Australia),Asia
-Colombia,South America
-Comoros,Africa
-Congo,Africa
-Cook Islands (New Zealand),Oceania
-Costa Rica,North America
-Croatia,Europe
-Cuba,North America
-Curacao (Netherlands),North America
-Cyprus,Asia
-Czech Republic,Europe
-Democratic Republic of the Congo,Africa
-Denmark,Europe
-Djibouti,Africa
-Dominica,North America
-Dominican Republic,North America
-East Timor,Asia
-Ecuador,South America
-Egypt,Africa
-El Salvador,North America
-Equatorial Guinea,Africa
-Eritrea,Africa
-Estonia,Europe
-Ethiopia,Africa
-Falkland Islands (UK),South America
-Faroe Islands (Denmark),Europe
-Federated States of Micronesia,Oceania
-Fiji,Oceania
-Finland,Europe
-France,Europe
-French Guiana (France),South America
-French Polynesia (France),Oceania
-French Southern & Antarctic Lands (France),Antarctica
-Gabon,Africa
-Gambia,Africa
-Georgia,Asia
-Germany,Europe
-Ghana,Africa
-Gibraltar (UK),Europe
-Glorioso Islands (France),Africa
-Greece,Europe
-Greenland (Denmark),North America
-Grenada,North America
-Guadeloupe (France),North America
-Guam (US),Oceania
-Guatemala,North America
-Guernsey (UK),Europe
-Guinea,Africa
-Guinea-Bissau,Africa
-Guyana,South America
-Haiti,North America
-Heard Island & McDonald Islands (Australia),Oceania
-Honduras,North America
-Howland Island (US),Oceania
-Hungary,Europe
-Iceland,Europe
-India,Asia
-Indonesia,Asia
-Iran,Asia
-Iraq,Asia
-Ireland,Europe
-Isle of Man (UK),Europe
-Israel,Asia
-Italy,Europe
-Ivory Coast,Africa
-Jamaica,North America
-Jan Mayen (Norway),Europe
-Japan,Asia
-Jarvis Island (US),Oceania
-Jersey (UK),Europe
-Johnston Atoll (US),Oceania
-Jordan,Asia
-Juan De Nova Island (France),Africa
-Kazakhstan,Asia
-Kenya,Africa
-Kiribati,Oceania
-Kuwait,Asia
-Kyrgyzstan,Asia
-Laos,Asia
-Latvia,Europe
-Lebanon,Asia
-Lesotho,Africa
-Liberia,Africa
-Libya,Africa
-Liechtenstein,Europe
-Lithuania,Europe
-Luxembourg,Europe
-Macedonia,Europe
-Madagascar,Africa
-Malawi,Africa
-Malaysia,Asia
-Maldives,Asia
-Mali,Africa
-Malta,Europe
-Marshall Islands,Oceania
-Martinique (France),North America
-Mauritania,Africa
-Mauritius,Africa
-Mayotte (France),Africa
-Mexico,North America
-Midway Islands (US),Oceania
-Moldova,Europe
-Monaco,Europe
-Mongolia,Asia
-Montenegro,Europe
-Montserrat (UK),North America
-Morocco,Africa
-Mozambique,Africa
-Myanmar,Asia
-Namibia,Africa
-Nauru,Oceania
-Nepal,Asia
-Netherlands,Europe
-New Caledonia (France),Oceania
-New Zealand,Oceania
-Nicaragua,North America
-Niger,Africa
-Nigeria,Africa
-Niue (New Zealand),Oceania
-Norfolk Island (Australia),Oceania
-North Korea,Asia
-Northern Mariana Islands (US),Oceania
-Norway,Europe
-Oman,Asia
-Pakistan,Asia
-Palau (US),Oceania
-Palestine,Asia
-Panama,North America
-Papua New Guinea,Oceania
-Paracel Islands (China),Asia
-Paraguay,South America
-Peru,South America
-Philippines,Asia
-Pitcairn Islands (UK),Oceania
-Poland,Europe
-Portugal,Europe
-Puerto Rico (US),North America
-Qatar,Asia
-Reunion (France),Africa
-Romania,Europe
-Russia,Europe
-Rwanda,Africa
-San Marino,Europe
-Sao Tome and Principe,Africa
-Saudi Arabia,Asia
-Senegal,Africa
-Serbia,Europe
-Seychelles,Africa
-Sierra Leone,Africa
-Singapore,Asia
-Slovakia,Europe
-Slovenia,Europe
-Solomon Islands,Oceania
-Somalia,Africa
-South Africa,Africa
-South Georgia and the South Sandwich Is (UK),South America
-South Korea,Asia
-South Sudan,Africa
-Spain,Europe
-Spratly Islands (Disputed),Asia
-Sri Lanka,Asia
-St. Helena (UK),Africa
-St. Kitts and Nevis,North America
-St. Lucia,North America
-St. Pierre and Miquelon (France),North America
-St. Vincent and the Grenadines,North America
-Sudan,Africa
-Suriname,South America
-Svalbard (Norway),Europe
-Swaziland,Africa
-Sweden,Europe
-Switzerland,Europe
-Syria,Asia
-Taiwan,Asia
-Tajikistan,Asia
-Tanzania,Africa
-Thailand,Asia
-Togo,Africa
-Tokelau (New Zealand),Oceania
-Tonga,Oceania
-Trinidad and Tobago,North America
-Tunisia,Africa
-Turkey,Asia
-Turkmenistan,Asia
-Turks and Caicos Islands (UK),North America
-Tuvalu,Oceania
-Uganda,Africa
-Ukraine,Europe
-United Arab Emirates,Asia
-United Kingdom,Europe
-United States,North America
-Uruguay,South America
-Uzbekistan,Asia
-Vanuatu,Oceania
-Venezuela,South America
-Vietnam,Asia
-Wake Island (US),Oceania
-Wallis and Futuna (France),Oceania
-Western Sahara,Africa
-Western Samoa,Oceania
-Yemen,Asia
-Zambia,Africa
-Zimbabwe,Africa
+Country,continent,clean_country,dependent
+Afghanistan,Asia,Afghanistan,False
+Albania,Europe,Albania,False
+Algeria,Africa,Algeria,False
+American Samoa (US),Oceania,American Samoa,United States
+American Virgin Islands (US),North America,American Virgin Islands,United States
+Andorra,Europe,Andorra,False
+Angola,Africa,Angola,False
+Anguilla (UK),North America,Anguilla,United Kingdom
+Antarctica,Antarctica,Antarctica,False
+Antigua and Barbuda,North America,Antigua and Barbuda,False
+Argentina,South America,Argentina,False
+Armenia,Asia,Armenia,False
+Aruba (Netherlands),South America,Aruba,Netherlands
+Australia,Oceania,Australia,False
+Austria,Europe,Austria,False
+Azerbaijan,Asia,Azerbaijan,False
+Bahamas,North America,Bahamas,False
+Bahrain,Asia,Bahrain,False
+Baker Island (US),Oceania,Baker Island,United States
+Bangladesh,Asia,Bangladesh,False
+Barbados,North America,Barbados,False
+Belarus,Europe,Belarus,False
+Belgium,Europe,Belgium,False
+Belize,North America,Belize,False
+Benin,Africa,Benin,False
+Bermuda (UK),North America,Bermuda,United Kingdom
+Bhutan,Asia,Bhutan,False
+Bolivia,South America,Bolivia,False
+Bonaire (Netherlands),North America,Bonaire,Netherlands
+Bosnia and Herzegovina,Europe,Bosnia and Herzegovina,False
+Botswana,Africa,Botswana,False
+Bouvet Island (Norway),Antarctica,Bouvet Island,Norway
+Brazil,South America,Brazil,False
+British Indian Ocean Territory (UK),Asia,British Indian Ocean Territory,United Kingdom
+British Virgin Islands (UK),North America,British Virgin Islands,United Kingdom
+Brunei,Asia,Brunei,False
+Bulgaria,Europe,Bulgaria,False
+Burkina Faso,Africa,Burkina Faso,False
+Burundi,Africa,Burundi,False
+Cambodia,Asia,Cambodia,False
+Cameroon,Africa,Cameroon,False
+Canada,North America,Canada,False
+Cape Verde,Africa,Cape Verde,False
+Cayman Islands (UK),North America,Cayman Islands,United Kingdom
+Central African Republic,Africa,Central African Republic,False
+Chad,Africa,Chad,False
+Chile,South America,Chile,False
+China,Asia,China,False
+Christmas Island (Australia),Asia,Christmas Island,Australia
+Cocos (Keeling) Islands (Australia),Asia,Cocos,Keeling
+Colombia,South America,Colombia,False
+Comoros,Africa,Comoros,False
+Congo,Africa,Congo,False
+Cook Islands (New Zealand),Oceania,Cook Islands,New Zealand
+Costa Rica,North America,Costa Rica,False
+Croatia,Europe,Croatia,False
+Cuba,North America,Cuba,False
+Curacao (Netherlands),North America,Curacao,Netherlands
+Cyprus,Asia,Cyprus,False
+Czech Republic,Europe,Czech Republic,False
+Democratic Republic of the Congo,Africa,Democratic Republic of the Congo,False
+Denmark,Europe,Denmark,False
+Djibouti,Africa,Djibouti,False
+Dominica,North America,Dominica,False
+Dominican Republic,North America,Dominican Republic,False
+East Timor,Asia,East Timor,False
+Ecuador,South America,Ecuador,False
+Egypt,Africa,Egypt,False
+El Salvador,North America,El Salvador,False
+Equatorial Guinea,Africa,Equatorial Guinea,False
+Eritrea,Africa,Eritrea,False
+Estonia,Europe,Estonia,False
+Ethiopia,Africa,Ethiopia,False
+Falkland Islands (UK),South America,Falkland Islands,United Kingdom
+Faroe Islands (Denmark),Europe,Faroe Islands,Denmark
+Federated States of Micronesia,Oceania,Federated States of Micronesia,False
+Fiji,Oceania,Fiji,False
+Finland,Europe,Finland,False
+France,Europe,France,False
+French Guiana (France),South America,French Guiana,France
+French Polynesia (France),Oceania,French Polynesia,France
+French Southern & Antarctic Lands (France),Antarctica,French Southern & Antarctic Lands,France
+Gabon,Africa,Gabon,False
+Gambia,Africa,Gambia,False
+Georgia,Asia,Georgia,False
+Germany,Europe,Germany,False
+Ghana,Africa,Ghana,False
+Gibraltar (UK),Europe,Gibraltar,United Kingdom
+Glorioso Islands (France),Africa,Glorioso Islands,France
+Greece,Europe,Greece,False
+Greenland (Denmark),North America,Greenland,Denmark
+Grenada,North America,Grenada,False
+Guadeloupe (France),North America,Guadeloupe,France
+Guam (US),Oceania,Guam,United States
+Guatemala,North America,Guatemala,False
+Guernsey (UK),Europe,Guernsey,United Kingdom
+Guinea,Africa,Guinea,False
+Guinea-Bissau,Africa,Guinea-Bissau,False
+Guyana,South America,Guyana,False
+Haiti,North America,Haiti,False
+Heard Island & McDonald Islands (Australia),Oceania,Heard Island & McDonald Islands,Australia
+Honduras,North America,Honduras,False
+Howland Island (US),Oceania,Howland Island,United States
+Hungary,Europe,Hungary,False
+Iceland,Europe,Iceland,False
+India,Asia,India,False
+Indonesia,Asia,Indonesia,False
+Iran,Asia,Iran,False
+Iraq,Asia,Iraq,False
+Ireland,Europe,Ireland,False
+Isle of Man (UK),Europe,Isle of Man,United Kingdom
+Israel,Asia,Israel,False
+Italy,Europe,Italy,False
+Ivory Coast,Africa,Ivory Coast,False
+Jamaica,North America,Jamaica,False
+Jan Mayen (Norway),Europe,Jan Mayen,Norway
+Japan,Asia,Japan,False
+Jarvis Island (US),Oceania,Jarvis Island,United States
+Jersey (UK),Europe,Jersey,United Kingdom
+Johnston Atoll (US),Oceania,Johnston Atoll,United States
+Jordan,Asia,Jordan,False
+Juan De Nova Island (France),Africa,Juan De Nova Island,France
+Kazakhstan,Asia,Kazakhstan,False
+Kenya,Africa,Kenya,False
+Kiribati,Oceania,Kiribati,False
+Kuwait,Asia,Kuwait,False
+Kyrgyzstan,Asia,Kyrgyzstan,False
+Laos,Asia,Laos,False
+Latvia,Europe,Latvia,False
+Lebanon,Asia,Lebanon,False
+Lesotho,Africa,Lesotho,False
+Liberia,Africa,Liberia,False
+Libya,Africa,Libya,False
+Liechtenstein,Europe,Liechtenstein,False
+Lithuania,Europe,Lithuania,False
+Luxembourg,Europe,Luxembourg,False
+Macedonia,Europe,Macedonia,False
+Madagascar,Africa,Madagascar,False
+Malawi,Africa,Malawi,False
+Malaysia,Asia,Malaysia,False
+Maldives,Asia,Maldives,False
+Mali,Africa,Mali,False
+Malta,Europe,Malta,False
+Marshall Islands,Oceania,Marshall Islands,False
+Martinique (France),North America,Martinique,France
+Mauritania,Africa,Mauritania,False
+Mauritius,Africa,Mauritius,False
+Mayotte (France),Africa,Mayotte,France
+Mexico,North America,Mexico,False
+Midway Islands (US),Oceania,Midway Islands,United States
+Moldova,Europe,Moldova,False
+Monaco,Europe,Monaco,False
+Mongolia,Asia,Mongolia,False
+Montenegro,Europe,Montenegro,False
+Montserrat (UK),North America,Montserrat,United Kingdom
+Morocco,Africa,Morocco,False
+Mozambique,Africa,Mozambique,False
+Myanmar,Asia,Myanmar,False
+Namibia,Africa,Namibia,False
+Nauru,Oceania,Nauru,False
+Nepal,Asia,Nepal,False
+Netherlands,Europe,Netherlands,False
+New Caledonia (France),Oceania,New Caledonia,France
+New Zealand,Oceania,New Zealand,False
+Nicaragua,North America,Nicaragua,False
+Niger,Africa,Niger,False
+Nigeria,Africa,Nigeria,False
+Niue (New Zealand),Oceania,Niue,New Zealand
+Norfolk Island (Australia),Oceania,Norfolk Island,Australia
+North Korea,Asia,North Korea,False
+Northern Mariana Islands (US),Oceania,Northern Mariana Islands,United States
+Norway,Europe,Norway,False
+Oman,Asia,Oman,False
+Pakistan,Asia,Pakistan,False
+Palau (US),Oceania,Palau,United States
+Palestine,Asia,Palestine,False
+Panama,North America,Panama,False
+Papua New Guinea,Oceania,Papua New Guinea,False
+Paracel Islands (China),Asia,Paracel Islands,China
+Paraguay,South America,Paraguay,False
+Peru,South America,Peru,False
+Philippines,Asia,Philippines,False
+Pitcairn Islands (UK),Oceania,Pitcairn Islands,United Kingdom
+Poland,Europe,Poland,False
+Portugal,Europe,Portugal,False
+Puerto Rico (US),North America,Puerto Rico,United States
+Qatar,Asia,Qatar,False
+Reunion (France),Africa,Reunion,France
+Romania,Europe,Romania,False
+Russia,Europe,Russia,False
+Rwanda,Africa,Rwanda,False
+San Marino,Europe,San Marino,False
+Sao Tome and Principe,Africa,Sao Tome and Principe,False
+Saudi Arabia,Asia,Saudi Arabia,False
+Senegal,Africa,Senegal,False
+Serbia,Europe,Serbia,False
+Seychelles,Africa,Seychelles,False
+Sierra Leone,Africa,Sierra Leone,False
+Singapore,Asia,Singapore,False
+Slovakia,Europe,Slovakia,False
+Slovenia,Europe,Slovenia,False
+Solomon Islands,Oceania,Solomon Islands,False
+Somalia,Africa,Somalia,False
+South Africa,Africa,South Africa,False
+South Georgia and the South Sandwich Is (UK),South America,South Georgia and the South Sandwich Is,United Kingdom
+South Korea,Asia,South Korea,False
+South Sudan,Africa,South Sudan,False
+Spain,Europe,Spain,False
+Spratly Islands (Disputed),Asia,Spratly Islands,Disputed
+Sri Lanka,Asia,Sri Lanka,False
+St. Helena (UK),Africa,St. Helena,United Kingdom
+St. Kitts and Nevis,North America,St. Kitts and Nevis,False
+St. Lucia,North America,St. Lucia,False
+St. Pierre and Miquelon (France),North America,St. Pierre and Miquelon,France
+St. Vincent and the Grenadines,North America,St. Vincent and the Grenadines,False
+Sudan,Africa,Sudan,False
+Suriname,South America,Suriname,False
+Svalbard (Norway),Europe,Svalbard,Norway
+Swaziland,Africa,Swaziland,False
+Sweden,Europe,Sweden,False
+Switzerland,Europe,Switzerland,False
+Syria,Asia,Syria,False
+Taiwan,Asia,Taiwan,False
+Tajikistan,Asia,Tajikistan,False
+Tanzania,Africa,Tanzania,False
+Thailand,Asia,Thailand,False
+Togo,Africa,Togo,False
+Tokelau (New Zealand),Oceania,Tokelau,New Zealand
+Tonga,Oceania,Tonga,False
+Trinidad and Tobago,North America,Trinidad and Tobago,False
+Tunisia,Africa,Tunisia,False
+Turkey,Asia,Turkey,False
+Turkmenistan,Asia,Turkmenistan,False
+Turks and Caicos Islands (UK),North America,Turks and Caicos Islands,United Kingdom
+Tuvalu,Oceania,Tuvalu,False
+Uganda,Africa,Uganda,False
+Ukraine,Europe,Ukraine,False
+United Arab Emirates,Asia,United Arab Emirates,False
+United Kingdom,Europe,United Kingdom,False
+United States,North America,United States,False
+Uruguay,South America,Uruguay,False
+Uzbekistan,Asia,Uzbekistan,False
+Vanuatu,Oceania,Vanuatu,False
+Venezuela,South America,Venezuela,False
+Vietnam,Asia,Vietnam,False
+Wake Island (US),Oceania,Wake Island,United States
+Wallis and Futuna (France),Oceania,Wallis and Futuna,France
+Western Sahara,Africa,Western Sahara,False
+Western Samoa,Oceania,Western Samoa,False
+Yemen,Asia,Yemen,False
+Zambia,Africa,Zambia,False
+Zimbabwe,Africa,Zimbabwe,False
