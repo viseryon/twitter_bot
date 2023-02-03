@@ -25,15 +25,15 @@ def analyst_recomendations():
     text = 'Nowe Rekomendacje 📝\n\n\n'
     for key, value in df.iterrows():
         if value[1] == 'KUPUJ':
-            text += f'{value[0]:10} 🟢 PT = {value[2]}\n'
+            text += f'🟢 {value[0]:10} PT = {value[2]}\n'
         elif value[1] == 'REDUKUJ':
-            text += f'{value[0]:10} 🔴 PT = {value[2]}\n'
+            text += f'🔴 {value[0]:10} PT = {value[2]}\n'
         elif value[1] == 'TRZYMAJ':
-            text += f'{value[0]:10} 🟡 PT = {value[2]}\n'
+            text += f'🟡 {value[0]:10} PT = {value[2]}\n'
         elif value[1] == 'AKUMULUJ':
-            text += f'{value[0]:10} 🟡🟢PT = {value[2]}\n'
+            text += f'🟡🟢 {value[0]:10} PT = {value[2]}\n'
         else:
-            text += f'{value[0]:10} ⚫ PT = {value[2]}\n'
+            text += f'⚫ {value[0]:10} PT = {value[2]}\n'
             text += f'{value[6]:}\n\n'
             continue
         text += f'{value[6]:} rekomenduje {value[1]:}\n\n'
