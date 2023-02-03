@@ -9,7 +9,8 @@ plt.style.use('dark_background')
 def get_options():
     r = requests.get(
         'https://www.gpw.pl/ajaxindex.php?action=DRGreek&start=list&format=html&lang=PL')
-    df = pd.read_html(r.text, encoding='utf-8')[1]
+    date, df = pd.read_html(r.text, encoding='utf-8')
+
     df.set_index('Lp', inplace=True)
     df.columns = ['title', 'imp_vol', 'vol', 'rfr',
                   'div_y', 'delta', 'gamma', 'theta', 'vega', 'rho']
@@ -37,7 +38,11 @@ def get_options():
     df['c_p'] = c_p
     df['strike'] = strike
 
-    return df, expirations
+    date = date.values.flatten()[0]
+    date = date.split(' | ')[1]
+    date = dt.strptime(date, r'%Y-%m-%d').date()
+
+    return df, expirations, date
 
 
 def get_wig20():
@@ -57,7 +62,7 @@ def do_charts():
     noww = dt.now()
     noww = noww.strftime(r'%Y/%m/%d %H:%M:%S')
 
-    chain, exp_dates = options
+    chain, exp_dates, _ = options
 
     avb_dates = []
 
