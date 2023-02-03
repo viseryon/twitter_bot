@@ -1,8 +1,15 @@
-from . import wig20_options
-from . import analysts_pts
-from . import analyst_rec
-from . import twitter
-from . import dni_opcje
+if __name__ == '__main__':
+    import wig20_options
+    import analysts_pts
+    import analyst_rec
+    import twitter
+    import dni_opcje
+else:
+    from . import wig20_options
+    from . import analysts_pts
+    from . import analyst_rec
+    from . import twitter
+    from . import dni_opcje
 
 import os
 import numpy as np
