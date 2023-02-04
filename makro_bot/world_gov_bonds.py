@@ -65,15 +65,20 @@ def get_sov_cds():
     return cds
 
 
-def foo():
+def get_cb_rates_and_changes() -> pd.DataFrame:
 
     link = 'http://www.worldgovernmentbonds.com/central-bank-rates/'
     cb_rates = pd.read_html(link)[0]
     clm = cb_rates.columns[0]
     cb_rates.drop(columns=clm, inplace=True)
 
-    # td = dt.today()
-    # calendar.monthrange(td.year, td.month)
+    cb_rates['Central Bank Rate'] = cb_rates['Central Bank Rate'].str.replace(' %', '')
+    cb_rates['Variation'] = cb_rates['Variation'].str.replace(' bp', '')
+    cb_rates.columns = ['Country', 'Rate_(%)', 'Variation_(%)', 'Period']
+    cb_rates[['Rate_(%)', 'Variation_(%)']] = cb_rates[['Rate_(%)', 'Variation_(%)']].astype(float)
+    cb_rates.set_index('Country', inplace=True)
+
+    return cb_rates
 
 
 def get_news():
