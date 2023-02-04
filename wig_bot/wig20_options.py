@@ -45,6 +45,19 @@ def get_options():
     return df, expirations, date
 
 
+def get_todays_options_quotes() -> pd.DataFrame:
+    df = pd.read_html('https://www.bankier.pl/gielda/notowania/opcje')
+    df = df[0].dropna()
+    df.columns = ['title', 'kurs', 'zmiana_abs', 'zmiana_pct',
+                  'otwarcie', 'maxx', 'minn', 'czas', 'exp_date']
+
+    df['zmiana_pct'] = df['zmiana_pct'].str.replace(',', '.')
+    df['zmiana_pct'] = df['zmiana_pct'].str.rstrip('%')
+    df['zmiana_pct'] = df['zmiana_pct'].astype(float)
+
+    return df
+
+
 def get_wig20():
 
     noww = dt.now()
