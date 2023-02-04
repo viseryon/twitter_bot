@@ -1,8 +1,3 @@
-if __name__ == '__main__':
-    import world_gov_bonds
-else:
-    from . import world_gov_bonds
-
 import geopandas as gpd
 import pandas as pd
 from datetime import datetime as dt
@@ -21,7 +16,7 @@ def get_europe_df() -> gpd.GeoDataFrame:
     return europe_df
 
 
-def get_world_df(region: str = 'World', russia: bool = False, only_independent: bool = True) -> gpd.GeoDataFrame:
+def get_world_df(region: str = 'World', russia: bool = False, only_independent: bool = True, antarctica: bool = False) -> gpd.GeoDataFrame:
 
     world = 'makro_bot/World_Countries.shp'
     world_df = gpd.read_file(world)
@@ -41,11 +36,14 @@ def get_world_df(region: str = 'World', russia: bool = False, only_independent: 
     if only_independent:
         countries = countries[countries.dependent == 'False']
 
+    if not antarctica:
+        countries = countries[countries.continent != 'Antarctica']
+
     merged_df = world_df.join(countries, how='right')
     return merged_df
 
 
-def combine_df_with_map(df: pd.DataFrame, mapa: str = 'world', russia: bool = False, only_independent: bool = True) -> gpd.GeoDataFrame:
+def combine_df_with_map(df: pd.DataFrame, mapa: str = 'world', russia: bool = False, only_independent: bool = True, antarctica: bool = False) -> gpd.GeoDataFrame:
 
     map_df = get_world_df(region=mapa, russia=russia,
                           only_independent=only_independent)
@@ -54,7 +52,7 @@ def combine_df_with_map(df: pd.DataFrame, mapa: str = 'world', russia: bool = Fa
     return merged_df, map_df
 
 
-def chart_stuff_on_map(df: pd.DataFrame, col: int, png_name: str, title: str = None, region: str = 'world', russia: bool = False, only_independent: bool = False) -> None:
+def chart_stuff_on_map(df: pd.DataFrame, col: int, png_name: str, title: str = None, region: str = 'world', russia: bool = False, only_independent: bool = False, antarctica: bool = False) -> None:
     """save map with chosen data
 
     Args:
@@ -65,7 +63,8 @@ def chart_stuff_on_map(df: pd.DataFrame, col: int, png_name: str, title: str = N
         region (str, optional): 'world' or continents
         russia (bool, optional): include russia
         only_independent (bool, optional): include dependecies
-    """        
+        antarctica (bool, optional): include antarctica
+    """
 
     if col >= df.shape[1]:
         col = 0
@@ -77,15 +76,16 @@ def chart_stuff_on_map(df: pd.DataFrame, col: int, png_name: str, title: str = N
     ready_df, background_df = combine_df_with_map(
         df, region, russia=russia, only_independent=only_independent)
 
-    fig, ax = plt.subplots(figsize=(16,9))
+    fig, ax = plt.subplots(figsize=(18, 9))
     backgournd = background_df.plot(ax=ax, color='grey')
     main_plot = ready_df.plot(
         ax=ax, column=col, legend=True, legend_kwds={'shrink': 0.5})
 
     ax.axis('off')
-    ax.grid(alpha=0.5)
-    # ax.annotate()
-    plt.title(title)
+    ax.grid(visible=True, alpha=1, which='both', axis='both')
+    fig.text(x=0.9, y=0.1, s='source: worldgovernmentbonds.com', color='grey')
+
+    plt.title(title, fontsize='xx-large', horizontalalignment='center')
     plt.tight_layout()
     plt.savefig(f'makro_bot/{png_name}.png', dpi=1000)
 
@@ -93,6 +93,4 @@ def chart_stuff_on_map(df: pd.DataFrame, col: int, png_name: str, title: str = N
 
 
 if __name__ == '__main__':
-    df = world_gov_bonds.get_gov_bonds()
-    chart_stuff_on_map(df, 2, 'abd')
     pass
