@@ -45,11 +45,15 @@ def get_options():
     return df, expirations, date
 
 
-def get_todays_options_quotes() -> pd.DataFrame:
+def get_todays_options_quotes(full: bool = False) -> pd.DataFrame:
     df = pd.read_html('https://www.bankier.pl/gielda/notowania/opcje')
     df = df[0].dropna()
     df.columns = ['title', 'kurs', 'zmiana_abs', 'zmiana_pct',
                   'otwarcie', 'maxx', 'minn', 'czas', 'exp_date']
+
+    df[['maxx', 'minn', 'otwarcie']] /= 10_000
+
+    df['kurs'] /= 100
 
     df['zmiana_pct'] = df['zmiana_pct'].str.replace(',', '.')
     df['zmiana_pct'] = df['zmiana_pct'].str.rstrip('%')
@@ -61,7 +65,10 @@ def get_todays_options_quotes() -> pd.DataFrame:
     full_df.rename({'exp_date_x': 'exp_date'}, axis=1, inplace=True)
     full_df.drop(columns='exp_date_y', inplace=True)
 
-    return full_df.dropna()
+    if not full:
+        return full_df.dropna()
+    else:
+        return full_df
 
 
 def get_wig20():
@@ -75,11 +82,18 @@ def get_wig20():
 
 
 def do_charts():
-    wig20 = get_wig20()
-    options = get_options()
 
     noww = dt.now()
+    td = dt.date(noww)
+
     noww = noww.strftime(r'%Y/%m/%d %H:%M:%S')
+
+    options, exps, date = get_options()
+    if date != td:
+        print('wig20_options.do_charts: rozne daty')
+        return False
+
+    wig20 = get_wig20()
 
     chain, exp_dates, _ = options
 
