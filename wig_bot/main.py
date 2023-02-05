@@ -19,7 +19,10 @@ from datetime import timedelta, datetime as dt
 def posting_option_charts(client, api):
     print('starting posting_option_charts')
 
-    wig20_options.do_charts()
+    if not wig20_options.do_charts():
+        print('dzis bez postowania opcji')
+        return False
+    
     print('wig20_options charts generated')
     charts = [x for x in os.listdir() if x.endswith('.png')]
     charts.sort()
@@ -116,10 +119,8 @@ def main(client, api):
 
 
     # kazdego dnia postuj opcje
-    if dni_opcje.is_good_day_to_post_option_charts():
-        posting_option_charts(client, api)
-    else:
-        print('dzis bez postowania opcji')
+    posting_option_charts(client, api)
+
 
     # w poniedzialki postuj analyst pts
     if td.isoweekday() == 1:
