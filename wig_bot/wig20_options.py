@@ -55,7 +55,13 @@ def get_todays_options_quotes() -> pd.DataFrame:
     df['zmiana_pct'] = df['zmiana_pct'].str.rstrip('%')
     df['zmiana_pct'] = df['zmiana_pct'].astype(float)
 
-    return df
+    opcje, exps, td = get_options()
+
+    full_df = pd.merge(opcje, df, on='title', how='outer')
+    full_df.rename({'exp_date_x': 'exp_date'}, axis=1, inplace=True)
+    full_df.drop(columns='exp_date_y', inplace=True)
+
+    return full_df.dropna()
 
 
 def get_wig20():
