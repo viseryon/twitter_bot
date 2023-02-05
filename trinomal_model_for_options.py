@@ -44,7 +44,7 @@ def crr_trinomial_tree(S, K, r, T, t, v, c_p):
 
     for row in range(0, 2*t + 1):
 
-        St = S * u**(max(t - row, 0))*d**(max(row - t, 0))
+        St = S * u**(max(t - row, 0)) * d**(max(row - t, 0))
         crrTree[row, 0] = max(x * St - x * K, 0)
 
     for col in range(t-1, -1, -1):
