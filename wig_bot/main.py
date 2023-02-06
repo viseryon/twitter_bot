@@ -3,17 +3,41 @@ if __name__ == '__main__':
     import analysts_pts
     import analyst_rec
     import twitter
-    import dni_opcje
+    import option_mispricing
 else:
     from . import wig20_options
     from . import analysts_pts
     from . import analyst_rec
     from . import twitter
-    from . import dni_opcje
+    from . import option_mispricing
+
 
 import os
 import numpy as np
 from datetime import timedelta, datetime as dt
+
+
+def posting_option_mispricing(client, api):
+
+    print('starting posting_option_mispricing')
+    option_mispricing.do_charts(wig20_options.get_wig20(), wig20_options.get_todays_options_quotes())
+
+    text = f'''📊 WIG20 OPTION MISPRICING 📊
+
+Opcje, których cena rynkowa znacznie różni się od ceny implikowanej na podstawie trójmianowego modelu wyceny opcji.
+
+#WIG20 #WIG #options #opcje #giełda #python #project
+'''
+
+    to_post = ['undervalued.png', 'overvalued.png']
+    twitter.tweet_things(client, api, text, to_post)
+
+    for chart in to_post:
+        os.remove(chart)
+
+    print('option_mispricing charts removed')
+
+    pass
 
 
 def posting_option_charts(client, api):
@@ -22,7 +46,7 @@ def posting_option_charts(client, api):
     if not wig20_options.do_charts():
         print('dzis bez postowania opcji')
         return False
-    
+
     print('wig20_options charts generated')
     charts = [x for x in os.listdir() if x.endswith('.png')]
     charts.sort()
@@ -117,10 +141,8 @@ def main(client, api):
     else:
         print('dzis bez postowania rekomendacji')
 
-
     # kazdego dnia postuj opcje
     posting_option_charts(client, api)
-
 
     # w poniedzialki postuj analyst pts
     if td.isoweekday() == 1:
@@ -128,8 +150,16 @@ def main(client, api):
     else:
         print('dzis bez postowania pts')
 
+    # w niedziele
+    if td.isoweekday() == 7:
+        posting_option_mispricing(client, api)
+    else:
+        print('dzis bez postowania option mispricing')
+
     print('wszystko ukonczone sukcesem')
 
 
 if __name__ == '__main__':
+    # posting_option_charts(1,1)
+
     pass
