@@ -88,14 +88,12 @@ def do_charts():
 
     noww = noww.strftime(r'%Y/%m/%d %H:%M:%S')
 
-    options, exps, date = get_options()
+    chain, exp_dates, date = get_options()
     if date != td:
         print('wig20_options.do_charts: rozne daty')
         return False
 
     wig20 = get_wig20()
-
-    chain, exp_dates, _ = options
 
     avb_dates = []
 
@@ -168,4 +166,5 @@ def do_charts():
 
 
 if __name__ == '__main__':
-    do_charts()
+    # do_charts()
+    print(get_wig20())
