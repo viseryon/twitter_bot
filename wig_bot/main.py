@@ -100,13 +100,13 @@ def posting_analyst_pts(client, api):
 
             text = f"""Analyst Price Targets for {ticker}
             
-📈 BULL {pt_bull:.2f} ({pt_bull/last_close - 1:.2%})
-📉 BEAR {pt_bear:.2f} ({pt_bear/last_close - 1:.2%})
-📊 MEAN {pt_mean:.2f} ({pt_mean/last_close - 1:.2%})
+📈 BULL {pt_bull:_.2f} ({pt_bull/last_close - 1:.2%})
+📉 BEAR {pt_bear:_.2f} ({pt_bear/last_close - 1:.2%})
+📊 MEAN {pt_mean:_.2f} ({pt_mean/last_close - 1:.2%})
 
-% of the WIG{indxx}     {share} 
-last close         {last_close:.2f}
-number of analysts {nr_of_analyst:.0f}
+% of the WIG{indxx}: {share} 
+# of analysts: {nr_of_analyst:.0f}
+last close: {last_close:_.2f}
 
 source: yfinance
 #GPW #WIG{indxx} #WIG #{ticker} #giełda #akcje #python #project"""
