@@ -1,43 +1,51 @@
-import requests
 import pandas as pd
 from datetime import datetime as dt
 
 
 def analyst_recomendations():
 
-    header = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'}
-    link = 'https://www.stockwatch.pl/rekomendacje/'
-    
-    r = requests.get(link, headers=header).text
-
-    df = pd.read_html(r)[0]
+    df = pd.read_html('https://strefainwestorow.pl/rekomendacje/lista-rekomendacji/wszystkie')[0]
 
     td = dt.today()
-    td = dt.strftime(td, r'%Y-%m-%d')
+    td = dt.strftime(td, r'%d.%m.%Y')
+    df.Rodzaj = df.Rodzaj.str.upper()
+    df['Spółka'] = df['Spółka'].str.replace('*', '', regex=False)
 
-    df = df[df['Data wydania'] == td]
+    new_df = df[df['Data publ.'] == '23.01.2023']
 
-    if df.empty:
+    if new_df.empty:
         return False
 
-    df.Rekomendacja = df.Rekomendacja.str.upper()
-
-    text = 'Nowe Rekomendacje 📝\n\n\n'
-    for key, value in df.iterrows():
+    text = '📝 Nowe Rekomendacje 📝\n\n'
+    for key, value in new_df.iterrows():
+        
         if value[1] == 'KUPUJ':
-            text += f'🟢 {value[0]:10} PT = {value[2]}\n'
+            text += f'🟢 {value[0]:10}\nPT = {value[2]}'
         elif value[1] == 'REDUKUJ':
-            text += f'🔴 {value[0]:10} PT = {value[2]}\n'
+            text += f'🔴 {value[0]:10}\nPT = {value[2]}'
         elif value[1] == 'TRZYMAJ':
-            text += f'🟡 {value[0]:10} PT = {value[2]}\n'
+            text += f'🟡 {value[0]:10}\nPT = {value[2]}'
         elif value[1] == 'AKUMULUJ':
-            text += f'🟡🟢 {value[0]:10} PT = {value[2]}\n'
+            text += f'🟢 {value[0]:10}\nPT = {value[2]}'
+        elif value[1] == 'WYCENA':
+            text += f'⚪ {value[0]:10}\nPT = {value[2]}'
+        elif value[1] == 'SPRZEDAJ':
+            text += f'🔴 {value[0]:10}\nPT = {value[2]}'
+        elif value[1] == 'NEUTRALNA':
+            text += f'🔵 {value[0]:10}\nPT = {value[2]}'
+        elif value[1] == 'ZAWIESZONA':
+            text += f'⚫ {value[0]:10}\nPT = {value[2]}'
         else:
-            text += f'⚫ {value[0]:10} PT = {value[2]}\n'
+            text += f'🟤 {value[0]:10}\nPT = {value[2]}'
             text += f'{value[6]:}\n\n'
             continue
-        text += f'{value[6]:} rekomenduje {value[1]:}\n\n'
+
+        if type(value[4]) != float:
+            text += f' ({value[4]})'
+
+        text += f'\n{value[6]:} -> {value[1]:}\n\n'
 
     text += '#GPW #WIG #giełda #akcje #python #project'
+
 
     return text
