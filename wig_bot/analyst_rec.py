@@ -11,7 +11,7 @@ def analyst_recomendations():
     df.Rodzaj = df.Rodzaj.str.upper()
     df['Spółka'] = df['Spółka'].str.replace('*', '', regex=False)
 
-    new_df = df[df['Data publ.'] == '23.01.2023']
+    new_df = df[df['Data publ.'] == td]
 
     if new_df.empty:
         return False
