@@ -11,7 +11,7 @@ else:
     from . import twitter
     from . import option_mispricing
 
-
+import traceback
 import os
 import numpy as np
 from datetime import timedelta, datetime as dt
@@ -136,28 +136,61 @@ def main(client, api):
     tmr = td + timedelta(1)
 
     # kazdego sprawdzaj rekomendacje
-    analyst_recs = analyst_rec.analyst_recomendations()
-    if analyst_recs:
-        twitter.tweet_things(client, api, text=analyst_recs)
+    try:
+        analyst_recs = analyst_rec.analyst_recomendations()
+        if analyst_recs:
+            twitter.tweet_things(client, api, text=analyst_recs)
+        else:
+            print('dzis bez postowania rekomendacji')
+    except Exception as e:
+        print('\nanalyst_recs ZAKONCZONE NIEPOWODZENIEM\n')
+        traceback.print_exception(e)
+        print()
     else:
-        print('dzis bez postowania rekomendacji')
+        print('analyst_recs zakonczone sukcesem')
+
 
     # kazdego dnia postuj opcje
-    posting_option_charts(client, api)
+    try:
+        posting_option_charts(client, api)
+    except Exception as e:
+        print('\nposting_option_charts ZAKONCZONE NIEPOWODZENIEM\n')
+        traceback.print_exception(e)
+        print()
+    else:
+        print('posting_option_charts zakonczone sukcesem')
+
+
 
     # w poniedzialki postuj analyst pts
-    if td.isoweekday() == 1:
-        posting_analyst_pts(client, api)
+    try:
+        if td.isoweekday() == 1:
+            posting_analyst_pts(client, api)
+        else:
+            print('dzis bez postowania pts')
+    except Exception as e:
+        print('\nposting_analyst_pts ZAKONCZONE NIEPOWODZENIEM\n')
+        traceback.print_exception(e)
+        print()
     else:
-        print('dzis bez postowania pts')
+        print('posting_analyst_pts zakonczone sukcesem')
+
 
     # w niedziele
-    if td.isoweekday() == 7:
-        posting_option_mispricing(client, api)
+    try:
+        if td.isoweekday() == 7:
+            posting_option_mispricing(client, api)
+        else:
+            print('dzis bez postowania option mispricing')
+    except Exception as e:
+            print('\nposting_option_mispricing ZAKONCZONE NIEPOWODZENIEM\n')
+            traceback.print_exception(e)
+            print()
     else:
-        print('dzis bez postowania option mispricing')
+        print('posting_option_mispricing zakonczone sukcesem')
 
-    print('wszystko ukonczone sukcesem')
+    
+    print('\nZAKONCZONO WIG20 MAIN\n')
 
 
 if __name__ == '__main__':
