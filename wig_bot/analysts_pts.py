@@ -41,7 +41,6 @@ def do_chart(ticker: str, polish=True):
         print('yfinance zwrocilo cos dziwnego')
         return False
 
-
     history = stonk.history('6mo')
     history.reset_index(inplace=True)
 
@@ -83,11 +82,14 @@ def do_chart(ticker: str, polish=True):
         0.4, 0.025, f'Number of Analyst Opinions {nr_of_analyst:.0f}', fontsize='large')
     plt.grid(which='both', alpha=0.5)
     plt.text(business_days[-1], bull[-1] + 0.5,
-             f'{bull[-1]:.2f}', fontsize='x-large', horizontalalignment='center')
+             f'{bull[-1]:_.2f}', fontsize='x-large', horizontalalignment='center',
+             bbox=dict(facecolor='black', edgecolor='white', boxstyle='round'))
     plt.text(business_days[-1], bear[-1] + 0.5,
-             f'{bear[-1]:.2f}', fontsize='x-large', horizontalalignment='center')
+             f'{bear[-1]:_.2f}', fontsize='x-large', horizontalalignment='center',
+             bbox=dict(facecolor='black', edgecolor='white', boxstyle='round'))
     plt.text(business_days[-1], base[-1] + 0.5,
-             f'{base[-1]:.2f}', fontsize='x-large', horizontalalignment='center')
+             f'{base[-1]:_.2f}', fontsize='x-large', horizontalalignment='center',
+             bbox=dict(facecolor='black', edgecolor='white', boxstyle='round'))
 
     fig.savefig(f'{ticker}_pts.png')
     print('chart saved')
@@ -96,6 +98,6 @@ def do_chart(ticker: str, polish=True):
 
 
 if __name__ == '__main__':
-    # do_chart('PKN')
-    wig20_40_components()
+    do_chart('LPP')
+    # wig20_40_components()
     pass
