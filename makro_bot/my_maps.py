@@ -76,18 +76,18 @@ def chart_stuff_on_map(df: pd.DataFrame, col: int, png_name: str, title: str = N
     ready_df, background_df = combine_df_with_map(
         df, region, russia=russia, only_independent=only_independent)
 
-    fig, ax = plt.subplots(figsize=(18, 9))
+    fig, ax = plt.subplots(figsize=(13, 7))
     backgournd = background_df.plot(ax=ax, color='grey')
     main_plot = ready_df.plot(
         ax=ax, column=col, legend=True, legend_kwds={'shrink': 0.5})
 
     ax.axis('off')
     ax.grid(visible=True, alpha=1, which='both', axis='both')
-    fig.text(x=0.9, y=0.1, s='source: worldgovernmentbonds.com', color='grey')
+    fig.text(x=0.5, y=0.1, s='source: worldgovernmentbonds.com', color='grey')
 
     plt.title(title, fontsize='xx-large', horizontalalignment='center')
     plt.tight_layout()
-    plt.savefig(f'makro_bot/{png_name}.png', dpi=1000)
+    plt.savefig(f'{png_name}.png', dpi=500)
 
     return
 

@@ -34,6 +34,8 @@ def post_cb_rates_map_changes(client, api):
 #interest_rates #central_banks #python #project'''
 
     print(text)
+
+    print('\n', len(text))
     # twitter.tweet_things(client, api, text, 'makro_bot/cb_rates_map.png')
     # print('chart tweeted')
     # os.remove('makro_bot/cb_rates_map.png')
@@ -58,4 +60,5 @@ def main(client, api):
     pass
 
 if __name__ == '__main__':
-    main(1, 1)
+    # main(1, 1)
+    post_cb_rates_map_changes(1, 1)
