@@ -20,8 +20,14 @@ from datetime import timedelta, datetime as dt
 def posting_option_mispricing(client, api):
 
     print('starting posting_option_mispricing')
+
+    df = wig20_options.get_todays_options_quotes()
+    if not df:
+        print('dzisiaj bez postowania option_mispricing')
+        return False
+
     option_mispricing.do_charts(
-        wig20_options.get_wig20(), wig20_options.get_todays_options_quotes())
+        wig20_options.get_wig20(), df)
 
     text = f'''📊 WIG20 OPTION MISPRICING 📊
 
