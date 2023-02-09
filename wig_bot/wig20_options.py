@@ -46,6 +46,12 @@ def get_options():
 
 
 def get_todays_options_quotes(full: bool = False) -> pd.DataFrame:
+    
+    opcje, exps, td = get_options()
+    if td != dt.today().date():
+        print('wig20_options.get_today_option_quotes: rozne daty')
+        return False
+        
     df = pd.read_html('https://www.bankier.pl/gielda/notowania/opcje')
     df = df[0].dropna()
     df.columns = ['title', 'kurs', 'zmiana_abs', 'zmiana_pct',
@@ -58,8 +64,6 @@ def get_todays_options_quotes(full: bool = False) -> pd.DataFrame:
     df['zmiana_pct'] = df['zmiana_pct'].str.replace(',', '.')
     df['zmiana_pct'] = df['zmiana_pct'].str.rstrip('%')
     df['zmiana_pct'] = df['zmiana_pct'].astype(float)
-
-    opcje, exps, td = get_options()
 
     full_df = pd.merge(opcje, df, on='title', how='outer')
     full_df.rename({'exp_date_x': 'exp_date'}, axis=1, inplace=True)
@@ -166,5 +170,4 @@ def do_charts():
 
 
 if __name__ == '__main__':
-    # do_charts()
-    print(get_wig20())
+    get_todays_options_quotes()
