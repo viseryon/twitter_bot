@@ -186,9 +186,9 @@ def main(client, api):
     try:
         posting_option_mispricing(client, api)
     except Exception as e:
-            print('\nposting_option_mispricing ZAKONCZONE NIEPOWODZENIEM\n')
-            traceback.print_exception(e)
-            print()
+        print('\nposting_option_mispricing ZAKONCZONE NIEPOWODZENIEM\n')
+        traceback.print_exception(e)
+        print()
     else:
         print('posting_option_mispricing zakonczone sukcesem')
 
@@ -197,6 +197,4 @@ def main(client, api):
 
 
 if __name__ == '__main__':
-    # posting_option_charts(1,1)
-
     pass
