@@ -176,12 +176,9 @@ def main(client, api):
         print('posting_analyst_pts zakonczone sukcesem')
 
 
-    # w niedziele
+    # kazdego dnia rob mispricing
     try:
-        if td.isoweekday() == 7:
-            posting_option_mispricing(client, api)
-        else:
-            print('dzis bez postowania option mispricing')
+        posting_option_mispricing(client, api)
     except Exception as e:
             print('\nposting_option_mispricing ZAKONCZONE NIEPOWODZENIEM\n')
             traceback.print_exception(e)
