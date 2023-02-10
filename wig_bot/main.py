@@ -11,6 +11,7 @@ else:
     from . import twitter
     from . import option_mispricing
 
+import pandas as pd
 import traceback
 import os
 import numpy as np
@@ -22,7 +23,7 @@ def posting_option_mispricing(client, api):
     print('starting posting_option_mispricing')
 
     df = wig20_options.get_todays_options_quotes()
-    if not df:
+    if type(df) != pd.DataFrame:
         print('dzisiaj bez postowania option_mispricing')
         return False
 
