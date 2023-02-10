@@ -138,6 +138,8 @@ source: yfinance
 
 def main(client, api):
 
+    print('STARTING MAIN WIG_BOT')
+
     td = dt.today()
     tmr = td + timedelta(1)
 
