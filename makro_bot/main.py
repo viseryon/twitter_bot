@@ -2,16 +2,35 @@ if __name__ == '__main__':
     import world_gov_bonds
     import my_maps
     import twitter
+    import poland_bonds
 else:
     from . import world_gov_bonds
     from . import my_maps
     from . import twitter
-import matplotlib.pyplot as plt
-import pandas as pd
-import geopandas as gpd
-import calendar
+    from . import poland_bonds
+
+import traceback
 import os
 from datetime import datetime as dt
+
+
+def post_poland_yield_curve(client, api):
+
+    print('starting post_poland_yield_curve')
+    poland_bonds.do_chart()
+
+    text = '''❕ THE SCARY LINE ❕\n
+🗨 Rentowność polskich obligacji skarbowych i jej zmiana w ostanim miesiącu. 🗨
+
+source: worldgovernmentbonds.com
+#yield #poland #NBP #bonds #python #project'''
+
+    to_post = ['poland_yield_curve.png']
+    twitter.tweet_things(client, api, text, to_post)
+    print('chart tweeted')
+
+    os.remove('poland_yield_curve.png')
+    print('chart removed')
 
 
 def post_cb_rates_map_changes(client, api):
@@ -48,17 +67,26 @@ def post_cb_rates_map_changes(client, api):
 
 def main(client, api):
     
+    print('STARTING MAIN MAKRO_BOT')
+
     td = dt.today()
-    # post_cb_rates_map_changes(1,1)
-    # ostatni_dzien_msc = calendar.monthrange(td.year, td.month)[1]
-    # if td.day == ostatni_dzien_msc:
-    #     post_cb_rates_map_changes(client, api)
-    # else:
-    #     print('dzisiaj bez postowania cb_rates_map_changes')
+
+    # w niedziele
+    try:
+        if td.isoweekday() == 7:
+            post_poland_yield_curve(client, api)
+        else:
+            print('dzisiaj bez postowania poland_yield_curve')
+    except Exception as e:
+        print('\npost_poland_yield_curve ZAKONCZONE NIEPOWODZENIEM\n')
+        traceback.print_exception(e)
+        print()
+    else:
+        print('post_poland_yield_curve zakonczone sukcesem')
 
 
-    pass
+    print('\nZAKONCZONO MAKRO MAIN')
+
 
 if __name__ == '__main__':
-    # main(1, 1)
-    post_cb_rates_map_changes(1, 1)
+    pass
