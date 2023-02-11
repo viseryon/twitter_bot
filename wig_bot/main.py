@@ -81,7 +81,7 @@ def posting_analyst_pts(client, api):
     print('starting posting_analyst_pts')
     wig20_40_comps = analysts_pts.wig20_40_components()
 
-    with open('wig_bot/last_10_pts_posts_tickers.txt', 'r', encoding='UTF-8') as f:
+    with open('last_10_pts_posts_tickers.txt', 'r', encoding='UTF-8') as f:
         last_10_tickers = f.read()
         last_10_tickers = last_10_tickers.split(',')[-10:]
         print(last_10_tickers)
