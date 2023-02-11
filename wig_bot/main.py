@@ -63,7 +63,7 @@ def posting_option_charts(client, api):
     to_post = list(set(to_post))
     print(to_post)
 
-    text = '''OPCJE NA INDEX WIG20 💡
+    text = '''💡 OPCJE NA INDEX WIG20 💡
 
 📈 Jak opcje wyceniają prawdopodobieństwo osiągnięcia danego strike'a po dzisiejszej sesji? 📉
 
