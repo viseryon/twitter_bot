@@ -171,9 +171,9 @@ def main(client, api):
 
 
 
-    # w poniedzialki postuj analyst pts
+    # w soboty postuj analyst pts
     try:
-        if td.isoweekday() == 1:
+        if td.isoweekday() == 6:
             posting_analyst_pts(client, api)
         else:
             print('dzis bez postowania pts')
