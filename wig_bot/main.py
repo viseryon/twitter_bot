@@ -30,7 +30,7 @@ def posting_option_mispricing(client, api):
     option_mispricing.do_charts(
         wig20_options.get_wig20(), df)
 
-    text = f'''📊 WIG20 OPTION MISPRICING 📊
+    text = f'''📊 WIG20 OPTIONS MISPRICING 📊
 
 Opcje, których cena rynkowa znacznie różni się od ceny implikowanej na podstawie trójmianowego modelu wyceny opcji.
 
