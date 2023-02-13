@@ -106,7 +106,7 @@ def do_charts(wig20, df):
     to_table.loc[to_table.Type == True, 'Type'] = 'CALL'
     to_table.loc[to_table.Type == False, 'Type'] = 'PUT'
 
-    print('przygotowano df to obrazkow')
+    print('przygotowano df do obrazkow')
 
     def apply_formatting(df: pd.DataFrame, title: str) -> None:
         formatowanie = df.style
