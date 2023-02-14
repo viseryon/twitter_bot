@@ -4,18 +4,47 @@ if __name__ == '__main__':
     import analyst_rec
     import twitter
     import option_mispricing
+    import wig20_heatmap
+    import dni_opcje
 else:
     from . import wig20_options
     from . import analysts_pts
     from . import analyst_rec
     from . import twitter
     from . import option_mispricing
+    from . import wig20_heatmap
+    from . import dni_opcje
 
 import pandas as pd
 import traceback
 import os
 import numpy as np
 from datetime import timedelta, datetime as dt
+
+
+def posting_wig20_heatmap(client, api):
+    print('starting posting_wig20_heatmap')
+
+    if not dni_opcje.is_good_day_to_post_option_charts():
+        print('dzisiaj bez postowania wig20_heatmap')
+        return
+    
+    wig20_heatmap.do_chart()
+
+    text = f'''📈 WIG20 HEATMAP 📉
+
+#WIG20 #WIG #giełda #python #project
+'''
+
+    to_post = ['wig20_heatmap.png']
+    twitter.tweet_things(client, api, text, to_post)
+
+    for chart in to_post:
+        os.remove(chart)
+
+    print('wig20_heatmap chart removed')
+
+    pass
 
 
 def posting_option_mispricing(client, api):
@@ -195,6 +224,15 @@ def main(client, api):
     else:
         print('posting_option_mispricing zakonczone sukcesem')
 
+    # kazdego dnia rob wig20_heatmap
+    try:
+        posting_wig20_heatmap(client, api)
+    except Exception as e:
+        print('\nposting_wig20_heatmap ZAKONCZONE NIEPOWODZENIEM\n')
+        traceback.print_exception(e)
+        print()
+    else:
+        print('posting_wig20_heatmap zakonczone sukcesem')
     
     print('\nZAKONCZONO WIG20 MAIN\n')
 
