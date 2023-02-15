@@ -48,7 +48,7 @@ def do_chart():
     plt.tight_layout()
     plt.axis('off')
 
-    fig.savefig('wig20_heatmap.png', transparent=False, dpi=800)
+    fig.savefig('wig20_heatmap.png', transparent=False, dpi=400)
 
     return True
 
