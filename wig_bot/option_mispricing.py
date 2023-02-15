@@ -132,7 +132,7 @@ def do_charts(wig20, df):
                         ('color', 'white'),
                         ('font-size', '125%')]
             }])
-        formatowanie = formatowanie.hide_index()
+        formatowanie = formatowanie.hide(axis="index")
         formatowanie = formatowanie.set_caption(title)
 
         if 'overvalued' in title:
