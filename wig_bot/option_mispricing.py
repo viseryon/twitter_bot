@@ -136,9 +136,9 @@ def do_charts(wig20, df):
         formatowanie = formatowanie.set_caption(title)
 
         if 'overvalued' in title:
-            dfi.export(formatowanie, 'overvalued.png', dpi=1_000)
+            dfi.export(formatowanie, 'overvalued.png', dpi=700)
         else:
-            dfi.export(formatowanie, 'undervalued.png', dpi=1_000)
+            dfi.export(formatowanie, 'undervalued.png', dpi=700)
 
     overvalued = to_table.sort_values('Difference', ascending=True)
     overvalued = overvalued.head(7)
