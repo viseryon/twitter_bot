@@ -16,6 +16,7 @@ else:
     from . import dni_opcje
 
 import pandas as pd
+import time
 import traceback
 import os
 import numpy as np
@@ -173,6 +174,7 @@ def main(client, api):
     td = dt.today()
     tmr = td + timedelta(1)
 
+    time.sleep(2)
     # kazdego sprawdzaj rekomendacje
     try:
         analyst_recs = analyst_rec.analyst_recomendations()
@@ -188,6 +190,7 @@ def main(client, api):
         print('analyst_recs zakonczone sukcesem')
 
 
+    time.sleep(2)
     # kazdego dnia postuj opcje
     try:
         posting_option_charts(client, api)
@@ -200,6 +203,7 @@ def main(client, api):
 
 
 
+    time.sleep(2)
     # w soboty postuj analyst pts
     try:
         if td.isoweekday() == 6:
@@ -214,6 +218,7 @@ def main(client, api):
         print('posting_analyst_pts zakonczone sukcesem')
 
 
+    time.sleep(2)
     # kazdego dnia rob mispricing
     try:
         posting_option_mispricing(client, api)
@@ -224,6 +229,8 @@ def main(client, api):
     else:
         print('posting_option_mispricing zakonczone sukcesem')
 
+
+    time.sleep(2)
     # kazdego dnia rob wig20_heatmap
     try:
         posting_wig20_heatmap(client, api)

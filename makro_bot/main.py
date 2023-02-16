@@ -10,6 +10,7 @@ else:
     from . import poland_bonds
 
 import traceback
+import time
 import os
 from datetime import datetime as dt
 
@@ -71,6 +72,7 @@ def main(client, api):
 
     td = dt.today()
 
+    time.sleep(2)
     # w niedziele
     try:
         if td.isoweekday() == 7:
