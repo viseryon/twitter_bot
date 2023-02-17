@@ -79,7 +79,7 @@ def get_wig20():
 
     noww = dt.now()
     noww = noww.strftime(r'%Y-%m-%d')
-    wig20 = yf.download('WIG20.WA', noww)
+    wig20 = yf.download('WIG20.WA', noww, period='1d')
     wig20 = wig20['Adj Close']
 
     return round(float(wig20), 2)
