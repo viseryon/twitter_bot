@@ -120,11 +120,6 @@ def posting_analyst_pts(client, api):
 
         print(f'wylosowano {ticker}')
 
-        if ticker in last_10_tickers:
-            print(f'{ticker} na liscie 10 ostatnich')
-            print('ponowne losowanie')
-            return do_chart()
-
         pts = analysts_pts.do_chart(ticker)
 
         if pts:
