@@ -29,12 +29,16 @@ def do_chart(ticker: str, polish=True):
 
     stonk = yf.Ticker(full_ticker)
 
-    analyst_pts = stonk.get_analyst_price_target(as_dict=True)
+    try:
+        analyst_pts = stonk.get_analyst_price_target(as_dict=True)
+    except:
+        print('failed to get_analyst_pts_target')
+        return False
 
     nr_of_analyst = analyst_pts[0]['numberOfAnalystOpinions']
     try:
         if nr_of_analyst < 3:
-            print('too few analysts')
+            print(f'za malo opinii dla {ticker}')
             return False
     except TypeError:
         print('got type error')

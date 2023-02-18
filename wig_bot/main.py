@@ -111,6 +111,7 @@ def posting_analyst_pts(client, api):
     print('starting posting_analyst_pts')
     wig20_40_comps = analysts_pts.wig20_40_components()
 
+    losowania = 0
     def do_chart():
 
         ticker = np.random.choice(wig20_40_comps.Ticker)
@@ -121,7 +122,6 @@ def posting_analyst_pts(client, api):
         print(f'wylosowano {ticker}')
 
         pts = analysts_pts.do_chart(ticker)
-
         if pts:
             pt_bull, pt_bear, pt_mean, last_close, nr_of_analyst = pts
 
@@ -147,8 +147,13 @@ source: yfinance
             print('analyst_pts chart removed')
 
         else:
-            print(f'za malo opinii dla {ticker}')
             print('nowe losowanie')
+            nonlocal losowania
+            losowania += 1
+            if losowania == 5:
+                print('za duzo bledow od yfinance')
+                print('dzis bez postowania analyst_pts')
+                return
             return do_chart()
 
 
