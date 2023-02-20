@@ -77,12 +77,11 @@ def get_todays_options_quotes(full: bool = False) -> pd.DataFrame:
 
 def get_wig20():
 
-    noww = dt.now()
-    noww = noww.strftime(r'%Y-%m-%d')
+    noww = dt.now().strftime(r'%Y-%m-%d')
     wig20 = yf.download('WIG20.WA', noww, period='1d')
-    wig20 = wig20['Adj Close']
+    wig20 = wig20['Adj Close'][0]
 
-    return round(float(wig20), 2)
+    return round(wig20, 2)
 
 
 def do_charts():
@@ -170,4 +169,5 @@ def do_charts():
 
 
 if __name__ == '__main__':
-    get_todays_options_quotes()
+    wig = get_wig20()
+    print(wig)
