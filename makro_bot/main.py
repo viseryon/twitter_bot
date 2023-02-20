@@ -20,7 +20,7 @@ def post_poland_yield_curve(client, api):
     print('starting post_poland_yield_curve')
     poland_bonds.do_chart()
 
-    text = '''❕ THE SCARY LINE ❕\n
+    text = '''❕ POLAND YIELD CURVE ❕\n
 🗨 Rentowność polskich obligacji skarbowych i jej zmiana w ostanim miesiącu. 🗨
 
 source: worldgovernmentbonds.com
