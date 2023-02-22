@@ -89,8 +89,10 @@ def posting_option_charts(client, api):
     charts = [x for x in os.listdir() if x.endswith('.png')]
     charts.sort()
     print(charts)
-    to_post = [charts[-1]] + charts[:2] + [charts[-2]]
+    to_post = charts[:2] + [charts[-2]]
     to_post = list(set(to_post))
+    to_post.sort()
+    to_post.insert(0, 'all.png')
     print(to_post)
 
     text = '''💡 OPCJE NA INDEX WIG20 💡
@@ -99,12 +101,12 @@ def posting_option_charts(client, api):
 
 #GPW #WIG20 #WIG #options #opcje #giełda #python #project'''
 
-    twitter.tweet_things(client, api, text, to_post)
+    # twitter.tweet_things(client, api, text, to_post)
 
-    for chart in charts:
-        os.remove(chart)
+    # for chart in charts:
+    #     os.remove(chart)
 
-    print('wig20_option charts removed')
+    # print('wig20_option charts removed')
 
 
 def posting_analyst_pts(client, api):
