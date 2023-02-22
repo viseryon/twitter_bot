@@ -1,6 +1,7 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 from datetime import datetime as dt
+import numpy as np
 plt.style.use('dark_background')
 
 
@@ -11,11 +12,17 @@ def do_chart():
     df.columns = ['a','Residual_Maturity','Last','Chg_1M','Chg_6M','b','c','d','e','Last_change']
     df.drop(columns=['a','b','c','d','e'], inplace=True)
 
-    df.Last = df.Last.str.replace('%' ,'').astype(float)
-    df.Chg_1M = df.Chg_1M.str.replace('n.a.', '0', regex=True)
-    df.Chg_6M = df.Chg_6M.str.replace('n.a.', '0', regex=True)
-    df.Chg_1M = df.Chg_1M.str.replace(' bp', '', regex=True).astype(float)
-    df.Chg_6M = df.Chg_6M.str.replace(' bp', '', regex=True).astype(float)
+    df.Last = df.Last.str.replace('%' ,'')
+    df.Chg_1M = df.Chg_1M.str.replace('n.a.', '', regex=True)
+    df.Chg_6M = df.Chg_6M.str.replace('n.a.', '', regex=True)
+    df.Chg_1M = df.Chg_1M.str.replace(' bp', '', regex=True)
+    df.Chg_6M = df.Chg_6M.str.replace(' bp', '', regex=True)
+    df = df.replace('', np.nan, regex=True)
+    df = df.replace('', np.nan, regex=True)
+
+    df[['Chg_1M', 'Chg_6M', 'Last']] = df[['Chg_1M', 'Chg_6M', 'Last']].astype(float)
+
+    df.dropna(inplace=True)
 
     fig, ax = plt.subplots(figsize=(16,9))
     ax.plot(df.Residual_Maturity, df.Last, linewidth=4, label='Current Yield Curve')
