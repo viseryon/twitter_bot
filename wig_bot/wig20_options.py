@@ -77,9 +77,15 @@ def get_todays_options_quotes(full: bool = False) -> pd.DataFrame:
 
 def get_wig20():
 
-    noww = dt.now().strftime(r'%Y-%m-%d')
-    wig20 = yf.download('WIG20.WA', noww, period='1d')
-    wig20 = wig20['Adj Close'][0]
+    # noww = dt.now().strftime(r'%Y-%m-%d')
+    # wig20 = yf.download('WIG20.WA', noww, period='1d')
+    # wig20 = wig20['Adj Close'][0]
+
+    df = pd.read_html('https://gpwbenchmark.pl/ajaxindex.php?action=GPWIndexes&start=showTable&tab=indexes&lang=PL')
+    df = df[0]
+    cena = df.iloc[0][8]
+    cena = cena.replace(u'\xa0', '').replace(',', '.')
+    wig20 = float(cena)
 
     return round(wig20, 2)
 
