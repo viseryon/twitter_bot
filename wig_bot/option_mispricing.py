@@ -65,6 +65,7 @@ def crr_trinomial_tree(S, K, r, T, t, v, c_p):
 
 def do_charts(wig20, df):
 
+    # import wig20_options
     # wig20 = wig20_options.get_wig20()
     # print('pobrano wig20')
 
@@ -152,4 +153,4 @@ def do_charts(wig20, df):
 
 
 if __name__ == '__main__':
-    do_charts()
+    do_charts(1, 1)
