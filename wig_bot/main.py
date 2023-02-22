@@ -101,12 +101,12 @@ def posting_option_charts(client, api):
 
 #GPW #WIG20 #WIG #options #opcje #giełda #python #project'''
 
-    # twitter.tweet_things(client, api, text, to_post)
+    twitter.tweet_things(client, api, text, to_post)
 
-    # for chart in charts:
-    #     os.remove(chart)
+    for chart in charts:
+        os.remove(chart)
 
-    # print('wig20_option charts removed')
+    print('wig20_option charts removed')
 
 
 def posting_analyst_pts(client, api):
@@ -162,6 +162,14 @@ source: yfinance
     do_chart()
 
 
+def clean_dir_from_pngs():
+    '''remove all pngs'''
+    pictures = [x for x in os.listdir() if x.endswith('.png')]
+
+    for picture in pictures:
+        os.remove(picture)
+
+
 def main(client, api):
 
     print('STARTING MAIN WIG_BOT')
@@ -181,6 +189,8 @@ def main(client, api):
         print('\nanalyst_recs ZAKONCZONE NIEPOWODZENIEM\n')
         traceback.print_exception(e)
         print()
+        clean_dir_from_pngs()
+        print('cleaned dir from pngs')
     else:
         print('analyst_recs zakonczone sukcesem')
 
@@ -193,6 +203,9 @@ def main(client, api):
         print('\nposting_option_charts ZAKONCZONE NIEPOWODZENIEM\n')
         traceback.print_exception(e)
         print()
+        clean_dir_from_pngs()
+        print('cleaned dir from pngs')
+
     else:
         print('posting_option_charts zakonczone sukcesem')
 
@@ -209,6 +222,9 @@ def main(client, api):
         print('\nposting_analyst_pts ZAKONCZONE NIEPOWODZENIEM\n')
         traceback.print_exception(e)
         print()
+        clean_dir_from_pngs()
+        print('cleaned dir from pngs')
+
     else:
         print('posting_analyst_pts zakonczone sukcesem')
 
@@ -221,6 +237,9 @@ def main(client, api):
         print('\nposting_option_mispricing ZAKONCZONE NIEPOWODZENIEM\n')
         traceback.print_exception(e)
         print()
+        clean_dir_from_pngs()
+        print('cleaned dir from pngs')
+
     else:
         print('posting_option_mispricing zakonczone sukcesem')
 
@@ -233,6 +252,9 @@ def main(client, api):
         print('\nposting_wig20_heatmap ZAKONCZONE NIEPOWODZENIEM\n')
         traceback.print_exception(e)
         print()
+        clean_dir_from_pngs()
+        print('cleaned dir from pngs')
+
     else:
         print('posting_wig20_heatmap zakonczone sukcesem')
     
