@@ -66,12 +66,12 @@ def crr_trinomial_tree(S, K, r, T, t, v, c_p):
 
 def do_charts(wig20, df):
 
-    import wig20_options
-    wig20 = wig20_options.get_wig20()
-    print('pobrano wig20')
+    # import wig20_options
+    # wig20 = wig20_options.get_wig20()
+    # print('pobrano wig20')
 
-    df = wig20_options.get_todays_options_quotes()
-    print('pobrano opcje i ich kwotowania')
+    # df = wig20_options.get_todays_options_quotes()
+    # print('pobrano opcje i ich kwotowania')
 
     td = dt.today()
     trinomial = []
