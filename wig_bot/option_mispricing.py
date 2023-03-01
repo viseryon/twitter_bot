@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime as dt
 import math
 import numpy as np
+import df2img
 
 
 def crr_trinomial_tree(S, K, r, T, t, v, c_p):
@@ -65,12 +66,12 @@ def crr_trinomial_tree(S, K, r, T, t, v, c_p):
 
 def do_charts(wig20, df):
 
-    # import wig20_options
-    # wig20 = wig20_options.get_wig20()
-    # print('pobrano wig20')
+    import wig20_options
+    wig20 = wig20_options.get_wig20()
+    print('pobrano wig20')
 
-    # df = wig20_options.get_todays_options_quotes()
-    # print('pobrano opcje i ich kwotowania')
+    df = wig20_options.get_todays_options_quotes()
+    print('pobrano opcje i ich kwotowania')
 
     td = dt.today()
     trinomial = []
@@ -141,14 +142,66 @@ def do_charts(wig20, df):
         else:
             dfi.export(formatowanie, 'undervalued.png', dpi=700)
 
+
+    def new_formatting(df: pd.DataFrame, title: str) -> None:
+
+        df = df.head(7)
+        df.index = range(1, 8)
+
+        df.Price = df.Price.map("{0:.2f}".format)
+        df['Implied Price'] = df['Implied Price'].map("{0:.2f}".format)
+        df['Difference'] = df['Difference'].map("{0:.2f}%".format)
+
+        fig = df2img.plot_dataframe(
+            df,
+            col_width=[0.2,0.8,0.8,0.5,0.5,0.6,0.8,0.8],
+            title=dict(
+                text="This is a title starting at the x-value x=0.1",
+                font_color="white",
+                font_size=20,
+                x=0.25,
+                xanchor="left",
+                yanchor='middle'
+            ),
+            tbl_header=dict(
+                fill_color="black",
+                font_color="cyan",
+                font_size=14,
+                align='center',
+                line_width=0
+            ),
+            tbl_cells=dict(
+                fill_color="black",
+                font_color="white",
+                line_width=0,
+            ),
+            fig_size=(800, 250),
+            paper_bgcolor="black",
+        )
+        
+        fig.add_annotation(text=f"{1}",
+                        xref="paper", yref="paper",
+                        font=dict(color='grey'),
+                        x=0.05, y=0.0, showarrow=False)
+        
+        fig.add_annotation(text="source: gpw",
+                        xref="paper", yref="paper",
+                        font=dict(color='grey'),
+                        x=0.95, y=0.0, showarrow=False)
+        
+        if 'overvalued' in title:
+            fig.write_image('overvalued.png', scale=3)
+        else:
+            fig.write_image('undervalued.png', scale=3)
+
     overvalued = to_table.sort_values('Difference', ascending=True)
     overvalued = overvalued.head(7)
     undervalued = to_table.sort_values('Difference', ascending=False)
     undervalued = undervalued.head(7)
 
-    apply_formatting(overvalued, 'Most overvalued WIG20 options')
+    new_formatting(overvalued, 'Most overvalued WIG20 options')
     print('zapisano obrazek overvalued')
-    apply_formatting(undervalued, 'Most undervalued WIG20 options')
+    new_formatting(undervalued, 'Most undervalued WIG20 options')
     print('zapisano obrazek undervalued')
 
 
