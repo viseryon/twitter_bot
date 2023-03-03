@@ -156,7 +156,7 @@ def do_charts(wig20, df):
             df,
             col_width=[0.2,0.8,0.8,0.5,0.5,0.6,0.8,0.8],
             title=dict(
-                text="This is a title starting at the x-value x=0.1",
+                text=title,
                 font_color="white",
                 font_size=20,
                 x=0.25,
@@ -179,7 +179,7 @@ def do_charts(wig20, df):
             paper_bgcolor="black",
         )
         
-        fig.add_annotation(text=f"{1}",
+        fig.add_annotation(text=f"{dt.now().strftime(r'%Y/%m/%d %H:%M:%S')}",
                         xref="paper", yref="paper",
                         font=dict(color='grey'),
                         x=0.05, y=0.0, showarrow=False)
