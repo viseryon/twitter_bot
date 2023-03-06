@@ -65,6 +65,13 @@ def post_cb_rates_map_changes(client, api):
     pass
 
 
+def clean_dir_from_pngs():
+    '''remove all pngs'''
+    pictures = [x for x in os.listdir() if x.endswith('.png')]
+
+    for picture in pictures:
+        os.remove(picture)
+
 
 def main(client, api):
     
@@ -83,6 +90,9 @@ def main(client, api):
         print('\npost_poland_yield_curve ZAKONCZONE NIEPOWODZENIEM\n')
         traceback.print_exception(e)
         print()
+        clean_dir_from_pngs()
+        print('cleaned dir from pngs')
+
     else:
         print('post_poland_yield_curve zakonczone sukcesem')
 
