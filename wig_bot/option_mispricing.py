@@ -159,7 +159,7 @@ def do_charts(wig20, df):
                 text=title,
                 font_color="white",
                 font_size=20,
-                x=0.25,
+                x=0.3,
                 xanchor="left",
                 yanchor='middle'
             ),
