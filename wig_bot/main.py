@@ -4,7 +4,7 @@ if __name__ == '__main__':
     import analyst_rec
     import twitter
     import option_mispricing
-    import wig20_heatmap
+    import wig_bot.wig_heatmaps as wig_heatmaps
     import dni_opcje
 else:
     from . import wig20_options
@@ -12,7 +12,7 @@ else:
     from . import analyst_rec
     from . import twitter
     from . import option_mispricing
-    from . import wig20_heatmap
+    from . import wig_heatmaps
     from . import dni_opcje
 
 import pandas as pd
@@ -30,7 +30,7 @@ def posting_wig20_heatmap(client, api):
         print('dzisiaj bez postowania wig20_heatmap')
         return
     
-    wig20_heatmap.do_chart()
+    wig_heatmaps.wig20_do_chart()
 
     text = f'''📈 WIG20 HEATMAP 📉
 
@@ -44,6 +44,32 @@ def posting_wig20_heatmap(client, api):
         os.remove(chart)
 
     print('wig20_heatmap chart removed')
+
+    pass
+
+
+def posting_wig_sectors_heatmap(client, api):
+    print(f'starting posting_wig_sectors_heatmap')
+
+    if not dni_opcje.is_good_day_to_post_option_charts():
+        print('dzisiaj bez postowania wig_sectors_heatmap')
+        return
+    
+    wig_heatmaps.wig_sectors_do_chart()
+
+    text = f'''📈 INDEKSY SEKTOROWE WIG 📉
+
+Wielkości pól odpowiadają wielkości pakietów akcji w indeksie, nie kapitalizacji rynkowej spółki.
+#WIG20 #WIG #indices #index #giełda #python #project
+'''
+
+    to_post = ['wig_sectors_heatmap.png']
+    twitter.tweet_things(client, api, text, to_post)
+
+    for chart in to_post:
+        os.remove(chart)
+
+    print('wig_sectors_heatmap chart removed')
 
     pass
 
@@ -257,6 +283,21 @@ def main(client, api):
 
     else:
         print('posting_wig20_heatmap zakonczone sukcesem')
+
+
+    time.sleep(2)
+    # kazdego dnia rob wig_sectors_heatmap
+    try:
+        posting_wig_sectors_heatmap(client, api)
+    except Exception as e:
+        print('\nposting_wig_sectors_heatmap ZAKONCZONE NIEPOWODZENIEM\n')
+        traceback.print_exception(e)
+        print()
+        clean_dir_from_pngs()
+        print('cleaned dir from pngs')
+
+    else:
+        print('posting_wig_sectors_heatmap zakonczone sukcesem')
     
     print('\nZAKONCZONO WIG20 MAIN\n')
 
