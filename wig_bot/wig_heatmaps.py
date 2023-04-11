@@ -100,7 +100,7 @@ def wig_sectors_do_chart():
 
     fig = px.treemap(
         data, 
-        path=[px.Constant('<br>'), 'Sector', 'Ticker'],
+        path=[px.Constant('- - - I N D E K S Y - - -'), 'Sector', 'Ticker'],
 
         values='Pakiet_pln',
         color='Zmiana_pct',
@@ -117,15 +117,15 @@ def wig_sectors_do_chart():
         '<b>%{customdata[2]}</b> %{customdata[3]:.2f} %{customdata[0]:.2%}<br>' + 
         '%{customdata[1]}',
         insidetextfont=dict(
-            size=80,
+            size=120,
         ),
 
         textfont=dict(
-            size=30
+            size=40
         ),
 
         textposition='middle center',
-        texttemplate='%{customdata[2]}<br><b>%{customdata[0]:.2%}</b><br><sup>%{customdata[3]:.2f} zł</sup>',
+        texttemplate='%{customdata[2]}<br><b>%{customdata[0]:.2%}</b><br><sup><i>%{customdata[3]:.2f} zł</i></sup>',
 
         hoverlabel=dict(
             bgcolor='#444444',
@@ -146,14 +146,14 @@ def wig_sectors_do_chart():
     )
 
     fig.update_layout(
-        margin=dict(t=140, l=5, r=5, b=120),
-        width=3840,
-        height=2160,
+        margin=dict(t=200, l=5, r=5, b=120),
+        width=7680,
+        height=4320,
         title=dict(
             text=f'INDEKSY SEKTOROWE WIG {dt.now():%Y/%m/%d}',
             font=dict(
                 color='white',
-                size=100,
+                size=150,
             ),
             yanchor='middle', xanchor='center',
             xref='paper', yref='paper',
@@ -165,10 +165,10 @@ def wig_sectors_do_chart():
 
     fig.add_annotation(
         text=("source: bankier.com"),
-        x=0.90, y=-0.05,#
+        x=0.90, y=-0.023,#
         font=dict(
             family="Calibri",
-            size=40,
+            size=80,
             color='white'
         ),
         opacity=0.7,
@@ -177,10 +177,10 @@ def wig_sectors_do_chart():
 
     fig.add_annotation(
         text=(dt.now().strftime(r'%Y/%m/%d %H:%M')),
-        x=0.1, y=-0.05,#
+        x=0.1, y=-0.025,#
         font=dict(
             family="Calibri",
-            size=40,
+            size=80,
             color='white'
         ),
         opacity=0.7,
