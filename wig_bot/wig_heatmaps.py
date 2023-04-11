@@ -105,7 +105,7 @@ def wig_sectors_do_chart():
         values='Pakiet_pln',
         color='Zmiana_pct',
         hover_name='Nazwa',
-        color_continuous_scale=['#CC0000', '#444444', '#00CC00'],
+        color_continuous_scale=['#CC0000', '#353535', '#00CC00'],
         hover_data=['Kurs', 'Zmiana_pct'],
         custom_data=data[['Zmiana_pct', 'Nazwa', 'Ticker', 'Kurs', 'Sector']],
 
@@ -125,7 +125,7 @@ def wig_sectors_do_chart():
         ),
 
         textposition='middle center',
-        texttemplate='%{customdata[2]}<br><b>%{customdata[0]:.2%}</b>',
+        texttemplate='%{customdata[2]}<br><b>%{customdata[0]:.2%}</b><br><sup>%{customdata[3]:.2f} zł</sup>',
 
         hoverlabel=dict(
             bgcolor='#444444',
@@ -187,17 +187,6 @@ def wig_sectors_do_chart():
         align="left",
     )
 
-    fig.add_annotation(
-        text=(dt.now().strftime(r'%Y/%m/%d %H:%M')),
-        x=0.1, y=-0.05,#
-        font=dict(
-            family="Calibri",
-            size=40,
-            color='white'
-        ),
-        opacity=0.7,
-        align="left",
-    )
 
     # fig.show()
     fig.write_image('wig_sectors_heatmap.png')
