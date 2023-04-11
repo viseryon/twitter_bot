@@ -135,13 +135,14 @@ def wig_sectors_do_chart():
                 size=16
             )
         ),
-        marker_line_width=0,
+        marker_line_width=3,
+        marker_line_color='#1a1a1a',
         root=dict(color='#1a1a1a')
 
     )
 
     fig.update_coloraxes(
-        showscale=False,
+        showscale=True,
         cmin=-0.03, cmax=0.03, cmid=0 
     )
 
