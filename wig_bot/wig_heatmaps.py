@@ -1,6 +1,6 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 import squarify
 import plotly.express as px
 plt.style.use('dark_background')
@@ -151,7 +151,7 @@ def wig_sectors_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEKSY SEKTOROWE WIG {dt.now():%Y/%m/%d}',
+            text=f'INDEKSY SEKTOROWE WIG {dt.now() + timedelta(hours=2):%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
