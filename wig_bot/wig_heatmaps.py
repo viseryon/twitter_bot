@@ -162,6 +162,18 @@ def wig_sectors_do_chart():
         ),
         paper_bgcolor="#1a1a1a",
         colorway=['#D9202E', '#AC1B26', '#7F151D', '#3B6323', '#518A30','#66B13C'],
+        coloraxis_colorbar=dict(
+            title="",
+            thicknessmode="pixels", thickness=130,
+            tickvals=[-0.029, -0.02, -0.01, 0, 0.01, 0.02, 0.029],
+            ticktext=['-3%', '-2%', '-1%', '0%', '+1%', '+2%', '+3%'],
+            orientation='v',
+            tickfont=dict(
+                color='white',
+                size=55,
+            ),
+            ticklabelposition='inside',
+        ),
     )
 
     fig.add_annotation(
