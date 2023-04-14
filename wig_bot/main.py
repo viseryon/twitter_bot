@@ -57,7 +57,7 @@ def posting_wig_sectors_heatmap(client, api):
     
     wig_heatmaps.wig_sectors_do_chart()
 
-    text = f'''📈 INDEKSY SEKTOROWE WIG w 8K! 📉
+    text = f'''📈 INDEKSY SEKTOROWE WIG 📉
 
 Wielkości pól odpowiadają wielkości pakietów akcji w indeksie, nie kapitalizacji rynkowej spółki.
 

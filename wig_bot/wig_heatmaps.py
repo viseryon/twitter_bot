@@ -160,8 +160,7 @@ def wig_sectors_do_chart():
             xref='paper', yref='paper',
             x=0.5
         ),
-        # paper_bgcolor="#1a1a1a",
-        paper_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="#1a1a1a",
         colorway=['#D9202E', '#AC1B26', '#7F151D', '#3B6323', '#518A30','#66B13C'],
     )
 
