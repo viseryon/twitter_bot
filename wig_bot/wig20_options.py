@@ -22,25 +22,45 @@ def get_options():
 
     expirations = list(pd.date_range(
         td.strftime(r'%Y-%m-%d'),
-        # '2023-01-01',
-        # '2023-12-31',
         dt(td.year + 1, 12, 31).strftime(r'%Y-%m-%d'),
         freq='WOM-3FRI'))
     expirations = [str(x).split()[0] for x in expirations]
     expirations = expirations[:12]
 
-    options = dict()
-    for i, exp in zip(range(65, 89), 2 * expirations):
-        if i - 65 < 12:
-            options[chr(i)] = [True, exp]
-        else:
-            options[chr(i)] = [False, exp]
+    expirations
+    exps = dict()
+    for exp in expirations:
+        exps[int(exp[5:7])] = exp
+
+    options = {}
+    for i in range(24):
+        kod = chr(i + 65)
+        typ, i = divmod(i, 12)
+        msc = i + 1
+
+        options[kod] = {'date': msc, 'cp': bool(1 - typ)}
+
+    for kod in options:
+        options[kod]['date'] = exps[options[kod]['date']]
 
     exp_date, c_p, strike = [], [], []
     for i, w in df.iterrows():
-        exp_date.append(options[w['title'][4]][1])
-        c_p.append(options[w['title'][4]][0])
+        exp_date.append(options[w['title'][4]]['date'])
+        c_p.append(options[w['title'][4]]['cp'])
         strike.append(int(w['title'][-4:]))
+
+    # options = dict()
+    # for i, exp in zip(range(65, 89), 2 * expirations):
+    #     if i - 65 < 12:
+    #         options[chr(i)] = [True, exp]
+    #     else:
+    #         options[chr(i)] = [False, exp]
+
+    # exp_date, c_p, strike = [], [], []
+    # for i, w in df.iterrows():
+    #     exp_date.append(options[w['title'][4]][1])
+    #     c_p.append(options[w['title'][4]][0])
+    #     strike.append(int(w['title'][-4:]))
 
     df['exp_date'] = exp_date
     df['c_p'] = c_p
