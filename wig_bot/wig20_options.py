@@ -1,12 +1,15 @@
 import pandas as pd
 import requests
 import yfinance as yf
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 from matplotlib import pyplot as plt
 plt.style.use('dark_background')
 
 
 def get_options():
+
+    td = dt.today()
+
     r = requests.get(
         'https://www.gpw.pl/ajaxindex.php?action=DRGreek&start=list&format=html&lang=PL')
     date, df = pd.read_html(r.text, encoding='utf-8')
@@ -18,8 +21,13 @@ def get_options():
     df.iloc[:, 1:3] /= 100
 
     expirations = list(pd.date_range(
-        '2023-01-01', '2023-12-31', freq='WOM-3FRI'))
+        td.strftime(r'%Y-%m-%d'),
+        # '2023-01-01',
+        # '2023-12-31',
+        dt(td.year + 1, 12, 31).strftime(r'%Y-%m-%d'),
+        freq='WOM-3FRI'))
     expirations = [str(x).split()[0] for x in expirations]
+    expirations = expirations[:12]
 
     options = dict()
     for i, exp in zip(range(65, 89), 2 * expirations):
