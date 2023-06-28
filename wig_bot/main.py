@@ -34,7 +34,7 @@ def posting_wig20_heatmap(client, api):
 
     text = f'''📈 WIG20 HEATMAP 📉
 
-#WIG20 #WIG #giełda #python #project
+#WIG20 #WIG #index #giełda #GPW #python #project
 '''
 
     to_post = ['wig20_heatmap.png']
@@ -71,6 +71,33 @@ Wielkości pól odpowiadają wielkości pakietów akcji w indeksie, nie kapitali
         os.remove(chart)
 
     print('wig_sectors_heatmap chart removed')
+
+    pass
+
+
+def posting_wig_heatmap(client, api):
+    print(f'starting posting_wig_heatmap')
+
+    if not dni_opcje.is_good_day_to_post_option_charts():
+        print('dzisiaj bez postowania wig_heatmap')
+        return
+    
+    wig_heatmaps.wig_do_chart()
+
+    text = f'''📈 WIG HEATMAP 📉
+
+Indeks WIG w nowej odsłonie!
+
+#WIG20 #WIG #index #giełda #GPW #python #project
+'''
+
+    to_post = ['wig_heatmap.png']
+    twitter.tweet_things(client, api, text, to_post)
+
+    for chart in to_post:
+        os.remove(chart)
+
+    print('wig_heatmap chart removed')
 
     pass
 
@@ -286,19 +313,34 @@ def main(client, api):
         print('posting_wig20_heatmap zakonczone sukcesem')
 
 
+    # time.sleep(2)
+    # # kazdego dnia rob wig_sectors_heatmap
+    # try:
+    #     posting_wig_sectors_heatmap(client, api)
+    # except Exception as e:
+    #     print('\nposting_wig_sectors_heatmap ZAKONCZONE NIEPOWODZENIEM\n')
+    #     traceback.print_exception(e)
+    #     print()
+    #     clean_dir_from_pngs()
+    #     print('cleaned dir from pngs')
+
+    # else:
+    #     print('posting_wig_sectors_heatmap zakonczone sukcesem')
+        
+    
     time.sleep(2)
-    # kazdego dnia rob wig_sectors_heatmap
+    # kazdego dnia rob wig_heatmap
     try:
-        posting_wig_sectors_heatmap(client, api)
+        posting_wig_heatmap(client, api)
     except Exception as e:
-        print('\nposting_wig_sectors_heatmap ZAKONCZONE NIEPOWODZENIEM\n')
+        print('\nposting_wig_heatmap ZAKONCZONE NIEPOWODZENIEM\n')
         traceback.print_exception(e)
         print()
         clean_dir_from_pngs()
         print('cleaned dir from pngs')
 
     else:
-        print('posting_wig_sectors_heatmap zakonczone sukcesem')
+        print('posting_wig_heatmap zakonczone sukcesem')
     
     print('\nZAKONCZONO WIG20 MAIN\n')
 
