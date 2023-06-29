@@ -154,7 +154,7 @@ def do_charts():
         plt.axvline(x=wig20, label='curr wig20',
                     ymin=0.1, ymax=0.9, ls='dashed')
         fig.text(0.1, 0.02, noww)
-        fig.text(0.525, 0.02, '@SliwinskiAlan')
+        fig.text(0.4, 0.02, '@SliwinskiAlan')
         fig.text(0.75, 0.02, 'source: www.gpw.pl')
         plt.ylabel('probability')
         plt.xlabel('strike')
@@ -182,7 +182,7 @@ def do_charts():
             plt.axvline(x=wig20, label='curr wig20',
                         ymin=0.1, ymax=0.9, ls='dashed')
             fig.text(0.1, 0.02, noww)
-            fig.text(0.525, 0.02, '@SliwinskiAlan')
+            fig.text(0.4, 0.02, '@SliwinskiAlan')
             fig.text(0.75, 0.02, 'source: www.gpw.pl')
             plt.ylabel('probability')
             plt.xlabel('strike')
