@@ -72,7 +72,7 @@ def wig20_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEKS WIG20 HEATMAP {dt.now():%Y/%m/%d}',
+            text=f'INDEX WIG20 HEATMAP {dt.now():%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
@@ -404,7 +404,7 @@ def wig_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEKS WIG HEATMAP {dt.now():%Y/%m/%d}',
+            text=f'INDEX WIG HEATMAP {dt.now():%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
