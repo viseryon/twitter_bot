@@ -34,6 +34,8 @@ def posting_wig20_heatmap(client, api):
 
     text = f'''📈 WIG20 HEATMAP 📉
 
+Indeks WIG20 w nowej odsłonie!
+
 #WIG20 #WIG #index #giełda #GPW #python #project
 '''
 
