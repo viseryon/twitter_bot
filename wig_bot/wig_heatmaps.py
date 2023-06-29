@@ -352,7 +352,7 @@ def wig_do_chart():
 
     fig = px.treemap(
         data, 
-        path=[px.Constant('         '), 'Sector', 'Industry', 'Ticker'],
+        path=[px.Constant('WIG'), 'Sector', 'Industry', 'Ticker'],
 
         values='Udzial',
         color='Zmiana_pct',
@@ -459,7 +459,19 @@ def wig_do_chart():
     # fig.show()
     fig.write_image('wig_heatmap.png')
 
-    return True
+
+    data['udzial_zmiana_pct'] = data.Udzial * data.Zmiana_pct
+    sectors_change = data.groupby('Sector')['udzial_zmiana_pct'].sum() / data.groupby('Sector')['Udzial'].sum()
+    
+    sectors_change = sectors_change.sort_values(ascending=False)
+    data = data.sort_values('Zmiana_pct', ascending=False)
+    
+    data_string = f'\n🟢 {data.Ticker.iloc[0]} {data.Nazwa.iloc[0]} {data.Zmiana_pct.iloc[0]:.2%}\n🔴 {data.Ticker.iloc[-1]} {data.Nazwa.iloc[-1]} {data.Zmiana_pct.iloc[-1]:.2%}\n\n'
+
+    for i, (sector, change) in enumerate(sectors_change.items()):
+        data_string += f'{i+1}. {sector} ->{change:>7.2%}\n'
+
+    return data_string
 
 
 

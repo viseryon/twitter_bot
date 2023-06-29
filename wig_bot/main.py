@@ -82,12 +82,10 @@ def posting_wig_heatmap(client, api):
         print('dzisiaj bez postowania wig_heatmap')
         return
     
-    wig_heatmaps.wig_do_chart()
+    data_string = wig_heatmaps.wig_do_chart()
 
     text = f'''📈 WIG HEATMAP 📉
-
-Indeks WIG w nowej odsłonie!
-
+{data_string}
 #WIG20 #WIG #index #giełda #GPW #python #project
 '''
 
