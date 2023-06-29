@@ -45,6 +45,7 @@ def do_chart():
     plt.ylabel('Yield', fontsize=14)
 
     fig.text(0.75, 0.015, 'source: worldgovernmentbonds.com')
+    fig.text(0.525, 0.015, '@SliwinskiAlan')
     fig.text(0.10, 0.015, f'{dt.now():%Y/%m/%d %H:%M:%S}')
 
     plt.legend(fontsize='x-large')
