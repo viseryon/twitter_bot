@@ -469,7 +469,8 @@ def wig_do_chart():
     data_string = f'\n🟢 {data.Ticker.iloc[0]} {data.Nazwa.iloc[0]} {data.Zmiana_pct.iloc[0]:.2%}\n🔴 {data.Ticker.iloc[-1]} {data.Nazwa.iloc[-1]} {data.Zmiana_pct.iloc[-1]:.2%}\n\n'
 
     for i, (sector, change) in enumerate(sectors_change.items()):
-        data_string += f'{i+1}. {sector} ->{change:>7.2%}\n'
+        if i < 3:
+            data_string += f'{i+1}. {sector} ->{change:>7.2%}\n'
 
     return data_string
 
