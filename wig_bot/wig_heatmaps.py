@@ -471,7 +471,20 @@ def wig_do_chart():
     sectors_change = sectors_change.sort_values(ascending=False)
     data = data.sort_values('Zmiana_pct', ascending=False)
     
-    data_string = f'\n🟢 {data.Ticker.iloc[0]} {data.Nazwa.iloc[0]} {data.Zmiana_pct.iloc[0]:.2%}\n🔴 {data.Ticker.iloc[-1]} {data.Nazwa.iloc[-1]} {data.Zmiana_pct.iloc[-1]:.2%}\n\n'
+    data_string = f'\nWIG perf 1D: {stat_chng:.2%}'
+
+    if stat_chng > 0.02:
+        data_string += ' 🟢❕\n'
+    elif stat_chng > 0:
+        data_string += ' 🟢\n'
+    elif stat_chng == 0:
+        data_string += ' ➖\n'
+    elif data_string > -0.02:
+        data_string += ' 🔴\n'
+    else:
+        data_string += ' 🔴❗\n'
+        
+    data_string += f'\n🟢 {data.Ticker.iloc[0]} {data.Nazwa.iloc[0]} {data.Zmiana_pct.iloc[0]:.2%}\n🔴 {data.Ticker.iloc[-1]} {data.Nazwa.iloc[-1]} {data.Zmiana_pct.iloc[-1]:.2%}\n\n'
 
     for i, (sector, change) in enumerate(sectors_change.items()):
         if i < 3:
