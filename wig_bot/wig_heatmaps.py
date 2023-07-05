@@ -20,6 +20,10 @@ def wig20_do_chart():
     data.Zmiana_pct /= 100
 
     data['Udzial'] = data.Kurs * data.Pakiet
+
+    data['udzial_zmiana_pct'] = data.Zmiana_pct * data.Udzial
+    
+    stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
     
     fig = px.treemap(
         data, 
@@ -72,7 +76,7 @@ def wig20_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEX WIG20 HEATMAP {dt.now():%Y/%m/%d}',
+            text=f'INDEX WIG20 ⁕ {stat_chng:.2%} ⁕ {dt.now():%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
@@ -171,7 +175,9 @@ def wig_sectors_do_chart():
 
     data['Pakiet_pln'] = data.Pakiet * data.Kurs
 
-    data['zmiana_x_udzial'] = data.Zmiana_pct * data.Udzial
+    data['udzial_zmiana_pct'] = data.Zmiana_pct * data.Udzial
+    
+    stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
 
     fig = px.treemap(
         data, 
@@ -226,7 +232,7 @@ def wig_sectors_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEKSY SEKTOROWE WIG {dt.now() + timedelta(hours=2):%Y/%m/%d}',
+            text=f'INDEKSY SEKTOROWE WIG ⁕ {stat_chng:.2%} ⁕ {dt.now() + timedelta(hours=2):%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
@@ -297,6 +303,8 @@ def wig_do_chart():
     data.Zmiana_pct /= 100
 
     data['Udzial'] = data.Kurs * data.Pakiet
+    
+    stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
     
     tickers = data.Ticker.to_list()
     tickers = [f'{tick}.WA' for tick in tickers]
@@ -404,7 +412,7 @@ def wig_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEX WIG HEATMAP {dt.now():%Y/%m/%d}',
+            text=f'INDEX WIG ⁕ {stat_chng:.2%} ⁕ {dt.now():%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
