@@ -175,9 +175,6 @@ def wig_sectors_do_chart():
 
     data['Pakiet_pln'] = data.Pakiet * data.Kurs
 
-    data['udzial_zmiana_pct'] = data.Zmiana_pct * data.Udzial
-    
-    stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
 
     fig = px.treemap(
         data, 
@@ -232,7 +229,7 @@ def wig_sectors_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEKSY SEKTOROWE WIG ⁕ {stat_chng:.2%} ⁕ {dt.now() + timedelta(hours=2):%Y/%m/%d}',
+            text=f'INDEKSY SEKTOROWE WIG ⁕ {dt.now() + timedelta(hours=2):%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
