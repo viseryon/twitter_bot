@@ -481,7 +481,7 @@ def wig_do_chart():
         data_string += ' 🟢\n'
     elif stat_chng == 0:
         data_string += ' ➖\n'
-    elif data_string > -0.02:
+    elif stat_chng > -0.02:
         data_string += ' 🔴\n'
     else:
         data_string += ' 🔴❗\n'
