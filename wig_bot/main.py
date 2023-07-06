@@ -283,19 +283,19 @@ def main(client, api):
         print('posting_analyst_pts zakonczone sukcesem')
 
 
-    time.sleep(2)
-    # kazdego dnia rob mispricing
-    try:
-        posting_option_mispricing(client, api)
-    except Exception as e:
-        print('\nposting_option_mispricing ZAKONCZONE NIEPOWODZENIEM\n')
-        traceback.print_exception(e)
-        print()
-        clean_dir_from_pngs()
-        print('cleaned dir from pngs')
+    # time.sleep(2)
+    # # kazdego dnia rob mispricing
+    # try:
+    #     posting_option_mispricing(client, api)
+    # except Exception as e:
+    #     print('\nposting_option_mispricing ZAKONCZONE NIEPOWODZENIEM\n')
+    #     traceback.print_exception(e)
+    #     print()
+    #     clean_dir_from_pngs()
+    #     print('cleaned dir from pngs')
 
-    else:
-        print('posting_option_mispricing zakonczone sukcesem')
+    # else:
+    #     print('posting_option_mispricing zakonczone sukcesem')
 
 
     time.sleep(2)
