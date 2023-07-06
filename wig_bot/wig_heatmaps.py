@@ -301,6 +301,8 @@ def wig_do_chart():
 
     data['Udzial'] = data.Kurs * data.Pakiet
     
+    data['udzial_zmiana_pct'] = data.Zmiana_pct * data.Udzial
+
     stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
     
     tickers = data.Ticker.to_list()
