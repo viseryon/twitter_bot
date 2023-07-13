@@ -1,10 +1,12 @@
 import pandas as pd
 from matplotlib import pyplot as plt
-from datetime import datetime as dt, timedelta
+from datetime import datetime as dt, timedelta, timezone
 import plotly.express as px
 import yahooquery as yq
 plt.style.use('dark_background')
 
+timezone_offset = 2.0  # CET Warsaw 
+tzinfo = timezone(timedelta(hours=timezone_offset))
 
 def wig20_do_chart():
 
@@ -76,7 +78,7 @@ def wig20_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEX WIG20 ⁕ {stat_chng:.2%} ⁕ {dt.now():%Y/%m/%d}',
+            text=f'INDEX WIG20 ⁕ {stat_chng:.2%} ⁕ {dt.now(tzinfo):%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
@@ -104,7 +106,7 @@ def wig20_do_chart():
     )
 
     fig.add_annotation(
-        text=(dt.now().strftime(r'%Y/%m/%d %H:%M')),
+        text=(dt.now(tzinfo).strftime(r'%Y/%m/%d %H:%M')),
         x=0.1, y=-0.025,#
         font=dict(
             family="Calibri",
@@ -229,7 +231,7 @@ def wig_sectors_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEKSY SEKTOROWE WIG ⁕ {dt.now() + timedelta(hours=2):%Y/%m/%d}',
+            text=f'INDEKSY SEKTOROWE WIG ⁕ {dt.now(tzinfo):%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
@@ -267,7 +269,7 @@ def wig_sectors_do_chart():
     )
 
     fig.add_annotation(
-        text=(dt.now().strftime(r'%Y/%m/%d %H:%M')),
+        text=(dt.now(tzinfo).strftime(r'%Y/%m/%d %H:%M')),
         x=0.1, y=-0.025,#
         font=dict(
             family="Calibri",
@@ -411,7 +413,7 @@ def wig_do_chart():
         width=7680,
         height=4320,
         title=dict(
-            text=f'INDEX WIG ⁕ {stat_chng:.2%} ⁕ {dt.now():%Y/%m/%d}',
+            text=f'INDEX WIG ⁕ {stat_chng:.2%} ⁕ {dt.now(tzinfo):%Y/%m/%d}',
             font=dict(
                 color='white',
                 size=150,
@@ -439,7 +441,7 @@ def wig_do_chart():
     )
 
     fig.add_annotation(
-        text=(dt.now().strftime(r'%Y/%m/%d %H:%M')),
+        text=(dt.now(tzinfo).strftime(r'%Y/%m/%d %H:%M')),
         x=0.1, y=-0.025,#
         font=dict(
             family="Calibri",
