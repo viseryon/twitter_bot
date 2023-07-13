@@ -477,17 +477,17 @@ def wig_do_chart():
     
     data_string = f'\nWIG perf 1D: {stat_chng:.2%}'
 
-    if stat_chng > 0.03:
+    if stat_chng > 0.02:
         data_string += ' 🟢🟢🟢\n'
-    elif stat_chng > 0.02:
+    elif stat_chng > 0.01:
         data_string += ' 🟢🟢\n'
     elif stat_chng > 0.005:
         data_string += ' 🟢\n'
     elif stat_chng > -0.005:
         data_string += ' ➖\n'
-    elif stat_chng > -0.02:
+    elif stat_chng > -0.01:
         data_string += ' 🔴\n'
-    elif stat_chng > -0.03:
+    elif stat_chng > -0.02:
         data_string += ' 🔴🔴\n'
     else:
         data_string += ' 🔴🔴🔴\n'
