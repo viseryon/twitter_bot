@@ -313,19 +313,19 @@ def main(client, api):
         print('posting_wig20_heatmap zakonczone sukcesem')
 
 
-    # time.sleep(2)
-    # # kazdego dnia rob wig_sectors_heatmap
-    # try:
-    #     posting_wig_sectors_heatmap(client, api)
-    # except Exception as e:
-    #     print('\nposting_wig_sectors_heatmap ZAKONCZONE NIEPOWODZENIEM\n')
-    #     traceback.print_exception(e)
-    #     print()
-    #     clean_dir_from_pngs()
-    #     print('cleaned dir from pngs')
+    time.sleep(2)
+    # kazdego dnia rob wig_sectors_heatmap
+    try:
+        posting_wig_sectors_heatmap(client, api)
+    except Exception as e:
+        print('\nposting_wig_sectors_heatmap ZAKONCZONE NIEPOWODZENIEM\n')
+        traceback.print_exception(e)
+        print()
+        clean_dir_from_pngs()
+        print('cleaned dir from pngs')
 
-    # else:
-    #     print('posting_wig_sectors_heatmap zakonczone sukcesem')
+    else:
+        print('posting_wig_sectors_heatmap zakonczone sukcesem')
         
     
     time.sleep(2)
