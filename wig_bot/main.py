@@ -61,7 +61,7 @@ def posting_wig_sectors_heatmap(client, api):
 
     text = f'''📈 INDEKSY SEKTOROWE WIG 📉
 
-Wielkości pól odpowiadają wielkości pakietów akcji w indeksie, nie kapitalizacji rynkowej spółki.
+Wielkości pól odpowiadają wielkości pakietów akcji w indeksie.
 
 #WIG20 #WIG #indices #index #giełda #python #project
 '''
