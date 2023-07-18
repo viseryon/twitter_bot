@@ -205,7 +205,7 @@ def wig_sectors_do_chart():
         ),
 
         textposition='middle center',
-        texttemplate='%{customdata[2]}<br><b>%{customdata[0]:.2%}</b><br><sup><i>%{customdata[3]:.2f} zł</i></sup>',
+        texttemplate='<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>',
 
         hoverlabel=dict(
             bgcolor='#444444',
