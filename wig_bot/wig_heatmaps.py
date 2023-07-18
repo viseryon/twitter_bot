@@ -280,6 +280,18 @@ def wig_sectors_do_chart():
         align="left",
     )
 
+    fig.add_annotation(
+        text=('@SliwinskiAlan'),
+        x=0.5, y=-0.025,#
+        font=dict(
+            family="Calibri",
+            size=80,
+            color='white'
+        ),
+        opacity=0.7,
+        align="left",
+    )
+
 
     # fig.show()
     fig.write_image('wig_sectors_heatmap.png')
