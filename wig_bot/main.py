@@ -21,6 +21,7 @@ import traceback
 import os
 import numpy as np
 from datetime import timedelta, datetime as dt
+from calendar import monthrange
 
 
 def posting_wig20_heatmap(client, api):
@@ -98,6 +99,38 @@ def posting_wig_heatmap(client, api):
         os.remove(chart)
 
     print('wig_heatmap chart removed')
+
+    pass
+
+
+def is_last_day_of_month():
+    
+    _, last_day = monthrange(dt.now().year, dt.now().month)
+
+    if last_day == dt.today().day:
+        return True
+    
+    return False
+
+
+def posting_wig_heatmap_1m_perf(client, api):
+    print(f'starting posting_wig_heatmap_1m_perf')
+
+    
+    data_string = wig_heatmaps.wig_do_chart_1m_perf()
+
+    text = f'''📈 WIG HEATMAP {dt.now().strftime('%B %Y')} 📉
+{data_string}
+#WIG20 #WIG #index #giełda #GPW #python #project
+'''
+
+    to_post = ['wig_heatmap_1m_perf.png']
+    twitter.tweet_things(client, api, text, to_post)
+
+    for chart in to_post:
+        os.remove(chart)
+
+    print('wig_heatmap_1m_perf chart removed')
 
     pass
 
@@ -231,7 +264,7 @@ def main(client, api):
     td = dt.today()
     tmr = td + timedelta(1)
 
-    time.sleep(60*10)
+    time.sleep(60*5)
     # kazdego sprawdzaj rekomendacje
     try:
         analyst_recs = analyst_rec.analyst_recomendations()
@@ -249,7 +282,7 @@ def main(client, api):
         print('analyst_recs zakonczone sukcesem')
 
 
-    time.sleep(60*10)
+    time.sleep(60*5)
     # kazdego dnia postuj opcje
     try:
         posting_option_charts(client, api)
@@ -265,7 +298,7 @@ def main(client, api):
 
 
 
-    time.sleep(60*10)
+    time.sleep(60*5)
     # w soboty postuj analyst pts
     try:
         if td.isoweekday() == 6:
@@ -283,7 +316,7 @@ def main(client, api):
         print('posting_analyst_pts zakonczone sukcesem')
 
 
-    # time.sleep(60*10)
+    # time.sleep(60*5)
     # # kazdego dnia rob mispricing
     # try:
     #     posting_option_mispricing(client, api)
@@ -298,7 +331,7 @@ def main(client, api):
     #     print('posting_option_mispricing zakonczone sukcesem')
 
 
-    time.sleep(60*10)
+    time.sleep(60*5)
     # kazdego dnia rob wig20_heatmap
     try:
         posting_wig20_heatmap(client, api)
@@ -313,7 +346,7 @@ def main(client, api):
         print('posting_wig20_heatmap zakonczone sukcesem')
 
 
-    time.sleep(60*10)
+    time.sleep(60*5)
     # kazdego dnia rob wig_sectors_heatmap
     try:
         posting_wig_sectors_heatmap(client, api)
@@ -328,7 +361,7 @@ def main(client, api):
         print('posting_wig_sectors_heatmap zakonczone sukcesem')
         
     
-    time.sleep(60*10)
+    time.sleep(60*5)
     # kazdego dnia rob wig_heatmap
     try:
         posting_wig_heatmap(client, api)
@@ -342,6 +375,26 @@ def main(client, api):
     else:
         print('posting_wig_heatmap zakonczone sukcesem')
     
+
+    # ostatniego dnia msc rob wig_heatmap_1m_perf
+    time.sleep(60*5)
+    if is_last_day_of_month():
+
+        try:
+            posting_wig_heatmap_1m_perf(client, api)
+        except Exception as e:
+            print('\nposting_wig_heatmap_1m_perf ZAKONCZONE NIEPOWODZENIEM\n')
+            traceback.print_exception(e)
+            print()
+            clean_dir_from_pngs()
+            print('cleaned dir from pngs')
+
+        else:
+            print('posting_wig_heatmap_1m_perf zakonczone sukcesem')
+    else:
+        print('dzisiaj bez postowania wig_heatmap_1m_perf')
+    
+
     print('\nZAKONCZONO WIG20 MAIN\n')
 
 
