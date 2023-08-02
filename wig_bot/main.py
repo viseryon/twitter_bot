@@ -58,12 +58,10 @@ def posting_wig_sectors_heatmap(client, api):
         print('dzisiaj bez postowania wig_sectors_heatmap')
         return
     
-    wig_heatmaps.wig_sectors_do_chart()
+    data_string = wig_heatmaps.wig_sectors_do_chart()
 
     text = f'''📈 INDEKSY SEKTOROWE WIG 📉
-
-Wielkości pól odpowiadają wielkości pakietów akcji w indeksie.
-
+{data_string}
 #WIG20 #WIG #indices #index #giełda #python #project
 '''
 

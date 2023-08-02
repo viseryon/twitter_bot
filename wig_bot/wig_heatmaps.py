@@ -288,7 +288,22 @@ def wig_sectors_do_chart():
     # fig.show()
     fig.write_image('wig_sectors_heatmap.png')
 
-    return True
+    df = df.sort_values('pakiet_zmiana', ascending=False, ignore_index=True)
+
+    data_string = ''
+    for indx, (sector, change, _) in df.iterrows():
+        sector = sector.removeprefix('WIG-')
+    
+    if change > 0.0025:
+        data_string += '🟢'
+    elif change > -0.0025:
+        data_string += '➖'
+    else:
+        data_string += '🔴'
+
+    data_string += f' {sector:<6} -> {change:.2%}\n'
+
+    return data_string
 
     
 def wig_do_chart():
