@@ -175,29 +175,29 @@ def wig_sectors_do_chart():
     data.Zmiana_pct /= 100
     data.Udzial /= 100
 
-    data['Pakiet_pln'] = data.Pakiet * data.Kurs
+    data['pakiet_pln'] = data.Pakiet * data.Kurs
+
+    data['pakiet_zmiana'] = data.pakiet_pln * data.Zmiana_pct
+    data = data.groupby(['Sector'])[['pakiet_zmiana', 'pakiet_pln']].sum(numeric_only=True)
+
+    data.reset_index(inplace=True)
+    data.pakiet_zmiana = data.pakiet_zmiana / data.pakiet_pln
 
 
     fig = px.treemap(
         data, 
-        path=[px.Constant('- - - I N D E K S Y - - -'), 'Sector', 'Ticker'],
+        path=[px.Constant('- - - I N D E K S Y - - -'), 'Sector'],
 
-        values='Pakiet_pln',
-        color='Zmiana_pct',
-        hover_name='Nazwa',
+        values='pakiet_pln',
+        color='pakiet_zmiana',
         color_continuous_scale=['#CC0000', '#353535', '#00CC00'],
-        hover_data=['Kurs', 'Zmiana_pct'],
-        custom_data=data[['Zmiana_pct', 'Nazwa', 'Ticker', 'Kurs', 'Sector']],
-
+        custom_data=data[['Sector', 'pakiet_zmiana']],
     )
 
 
     fig.update_traces(
-        hovertemplate='<b>%{customdata[4]}</b><br><br>' +
-        '<b>%{customdata[2]}</b> %{customdata[3]:.2f} %{customdata[0]:.2%}<br>' + 
-        '%{customdata[1]}',
         insidetextfont=dict(
-            size=120,
+            size=200,
         ),
 
         textfont=dict(
@@ -205,16 +205,8 @@ def wig_sectors_do_chart():
         ),
 
         textposition='middle center',
-        texttemplate='<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>',
+        texttemplate='<br>      %{customdata[0]}      <br><b>      %{customdata[1]:.2%}      </b>',
 
-        hoverlabel=dict(
-            bgcolor='#444444',
-            bordercolor='gold',
-            font=dict(
-                color='white',
-                size=16
-            )
-        ),
         marker_line_width=3,
         marker_line_color='#1a1a1a',
         root=dict(color='#1a1a1a')
