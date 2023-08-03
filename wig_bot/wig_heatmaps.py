@@ -288,7 +288,7 @@ def wig_sectors_do_chart():
     # fig.show()
     fig.write_image('wig_sectors_heatmap.png')
 
-    df = df.sort_values('pakiet_zmiana', ascending=False, ignore_index=True)
+    data = data.sort_values('pakiet_zmiana', ascending=False, ignore_index=True)
 
     data_string = ''
     for indx, (sector, change, _) in df.iterrows():
