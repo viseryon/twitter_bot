@@ -1,59 +1,102 @@
 import pandas as pd
 from matplotlib import pyplot as plt
 from datetime import datetime as dt
-import numpy as np
-plt.style.use('dark_background')
+
+plt.style.use("dark_background")
 
 
 def do_chart():
+    """makes chart with poland yield curve
 
-    df = pd.read_html('http://www.worldgovernmentbonds.com/country/poland/')[0]
+    Returns:
+        bool: True when finished successfully
+    """
 
-    df.columns = ['a','Residual_Maturity','Last','Chg_1M','Chg_6M','b','c','d','e','Last_change']
-    df.drop(columns=['a','b','c','d','e'], inplace=True)
+    # get data
+    df = pd.read_html("http://www.worldgovernmentbonds.com/country/poland/")[0]
 
-    df.Last = df.Last.str.replace('%' ,'')
-    df.Chg_1M = df.Chg_1M.str.replace('n.a.', '', regex=True)
-    df.Chg_6M = df.Chg_6M.str.replace('n.a.', '', regex=True)
-    df.Chg_1M = df.Chg_1M.str.replace(' bp', '', regex=True)
-    df.Chg_6M = df.Chg_6M.str.replace(' bp', '', regex=True)
-    df = df.replace('', np.nan, regex=True)
-    df = df.replace('', np.nan, regex=True)
+    # drop messy labels
+    df = df.droplevel(level=0, axis=1)
 
-    df[['Chg_1M', 'Chg_6M', 'Last']] = df[['Chg_1M', 'Chg_6M', 'Last']].astype(float)
+    # save col with update date
+    last_change = df["Last Change"]
 
-    df.dropna(inplace=True)
+    # choose right cols
+    df = df.iloc[:, 1:4]
 
-    fig, ax = plt.subplots(figsize=(16,9))
-    ax.plot(df.Residual_Maturity, df.Last, linewidth=4, label='Current Yield Curve')
-    ax.plot(df.Residual_Maturity, df.Last - df.Chg_1M / 100, linewidth=2, linestyle='-', color='grey', label='Yield Curve 1M ago')
+    # remove unwanted chars
+    df["Chg 1M"] = df["Chg 1M"].str.removesuffix(" bp")
+    df["Last"] = df["Last"].str.removesuffix("%")
 
-    color = ['r' if y < 0 else 'g' for y in df.Chg_1M]
+    # add col back
+    df["Date"] = last_change
+
+    # make it numeric
+    df.Last = pd.to_numeric(df.Last)
+    df["Chg 1M"] = pd.to_numeric(df["Chg 1M"])
+
+    # filter by date
+    today = dt.today().strftime("%d %b")
+    df = df[df.Date == today]
+
+    # rename cols
+    df.rename(
+        {"Residual Maturity": "Residual_Maturity", "Chg 1M": "Chg_1M"},
+        axis=1,
+        inplace=True,
+    )
+
+    # drop unused col
+    df.drop(columns=["Date"], inplace=True)
+
+    # plot
+    fig, ax = plt.subplots(figsize=(16, 9))
+    ax.plot(df.Residual_Maturity, df.Last, linewidth=4, label="Current Yield Curve")
+    ax.plot(
+        df.Residual_Maturity,
+        df.Last - df.Chg_1M / 100,
+        linewidth=2,
+        linestyle="-",
+        color="grey",
+        label="Yield Curve 1M ago",
+    )
+
+    color = ["r" if y < 0 else "g" for y in df.Chg_1M]
     bars = ax.bar(
-        df.Residual_Maturity, df.Chg_1M / 100, 
-        bottom=df.Last - df.Chg_1M / 100, color=color, width=0.1)
-    
+        df.Residual_Maturity,
+        df.Chg_1M / 100,
+        bottom=df.Last - df.Chg_1M / 100,
+        color=color,
+        width=0.1,
+    )
+
     ax.bar_label(
-        bars, label_type='center', 
-        fontsize=17, labels=[f'{x * 100:.0f} bp' for x in bars.datavalues], 
-        bbox=dict(facecolor='black', edgecolor='white', boxstyle='round'))
-    
-    ax.yaxis.set_major_formatter('{x:.1f} %')
-    
-    plt.title('Poland Government Bonds - Yield Curve and 1M change', fontsize=25, pad=10)
-    plt.xlabel('Maturities', fontsize=14, labelpad=10)
-    plt.ylabel('Yield', fontsize=14)
+        bars,
+        label_type="center",
+        fontsize=17,
+        labels=[f"{x * 100:.0f} bp" for x in bars.datavalues],
+        bbox=dict(facecolor="black", edgecolor="white", boxstyle="round"),
+    )
 
-    fig.text(0.75, 0.015, 'source: worldgovernmentbonds.com')
-    fig.text(0.625, 0.015, '@SliwinskiAlan')
-    fig.text(0.10, 0.015, f'{dt.now():%Y/%m/%d %H:%M:%S}')
+    ax.yaxis.set_major_formatter("{x:.1f} %")
 
-    plt.legend(fontsize='x-large')
+    plt.title(
+        "Poland Government Bonds - Yield Curve and 1M change", fontsize=25, pad=10
+    )
+    plt.xlabel("Maturities", fontsize=14, labelpad=10)
+    plt.ylabel("Yield", fontsize=14)
+
+    fig.text(0.75, 0.015, "source: worldgovernmentbonds.com")
+    fig.text(0.625, 0.015, "@SliwinskiAlan")
+    fig.text(0.10, 0.015, f"{dt.now():%Y/%m/%d %H:%M:%S}")
+
+    plt.legend(fontsize="x-large")
     plt.tight_layout()
     plt.grid(alpha=0.5, visible=True)
-    plt.savefig('poland_yield_curve.png', dpi=450)
+    plt.savefig("poland_yield_curve.png", dpi=450)
 
     return True
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     do_chart()
