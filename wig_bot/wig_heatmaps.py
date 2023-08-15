@@ -266,7 +266,7 @@ def wig_sectors_do_chart():
     data = data.sort_values("pakiet_zmiana", ascending=False, ignore_index=True)
 
     data_string = ""
-    for indx, (sector, change, _) in df.iterrows():
+    for indx, (sector, change, _) in data.iterrows():
         sector = sector.removeprefix("WIG-")
 
     if change > 0.0025:
