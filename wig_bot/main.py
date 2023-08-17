@@ -61,8 +61,10 @@ def posting_wig_sectors_heatmap(client, api):
     data_string = wig_heatmaps.wig_sectors_do_chart()
 
     text = f"""📈 INDEKSY SEKTOROWE WIG 📉
+
 {data_string}
-#WIG20 #WIG #indices #index #giełda #python #project
+
+#WIG20 #WIG #index #GPW #python
 """
 
     to_post = ["wig_sectors_heatmap.png"]
