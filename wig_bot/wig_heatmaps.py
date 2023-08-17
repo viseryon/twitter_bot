@@ -265,18 +265,21 @@ def wig_sectors_do_chart():
 
     data = data.sort_values("pakiet_zmiana", ascending=False, ignore_index=True)
 
-    data_string = ""
-    for _, (sector, change, _) in data.iterrows():
+    data_string = ''
+    for indx, (sector, change, _) in data.iterrows():
         sector = sector.removeprefix("WIG-")
 
         if change > 0.0025:
-            data_string += "🟢"
+            data_string += f"{indx + 1}. 🟢"
         elif change > -0.0025:
-            data_string += "➖"
+            data_string += f"{indx + 1}. ➖"
         else:
-            data_string += "🔴"
+            data_string += f"{indx + 1}. 🔴"
 
-        data_string += f" {sector:<6} -> {change:.2%}\n"
+        data_string += f" {sector:<6} -> {change:6.2%}\n"
+
+        if indx == 5:
+            break
 
     return data_string
 
