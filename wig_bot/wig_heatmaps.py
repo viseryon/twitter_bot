@@ -284,6 +284,160 @@ def wig_sectors_do_chart():
     return data_string
 
 
+def wig_sectors_do_chart_1w_perf():
+
+    today = dt.today()
+    week_nr = today.isocalendar().week
+
+    df = pd.read_csv('wig_bot/sectors.csv')
+    df.Ticker = df.Ticker + '.WA'
+
+    prices = yq.Ticker(df.Ticker).history(period='1mo')[['adjclose']].reset_index()
+
+    prices = prices.pivot(columns='symbol', index='date').droplevel(level=0, axis=1)
+
+    prices_chng = prices.reset_index()
+    prices_chng.date = pd.to_datetime(prices_chng.date)
+    prices_chng['week_nr'] = prices_chng.date.dt.isocalendar().week
+    b = prices_chng[prices_chng.week_nr == week_nr]
+    a = prices_chng[(prices_chng.week_nr == 52) | (prices_chng.week_nr == week_nr - 1)].tail(1)
+    prices_chng = pd.concat([a, b])
+
+    start, end = prices_chng.date.iloc[1], prices_chng.date.iloc[-1]
+
+    prices_chng = prices_chng.drop(columns=['date', 'week_nr'])
+
+    prices_chng = (prices_chng.pct_change() + 1).cumprod() - 1
+
+    prices_chng = prices_chng.tail(1).T.reset_index()
+    prices_chng.columns = ['Ticker', 'Zmiana_pct']
+
+    kurs = prices.tail(1).T.reset_index()
+    kurs.columns = ['Ticker', 'Kurs']
+
+    full = pd.merge(df, prices_chng, on='Ticker')
+    data = pd.merge(full, kurs, on='Ticker')
+
+    data["Udzial"] = data.Kurs * data.Pakiet
+
+    data["udzial_zmiana_pct"] = data.Zmiana_pct * data.Udzial
+
+    data = data.groupby(["Sector"])[["udzial_zmiana_pct", "Udzial"]].sum(
+        numeric_only=True
+    )
+
+    data.reset_index(inplace=True)
+
+    data['Zmiana_pct'] = data.udzial_zmiana_pct / data.Udzial
+
+    data.Sector = data.Sector.str.removeprefix('WIG-')
+
+    fig = px.treemap(
+        data,
+        path=[px.Constant("- - - I N D E K S Y - - -"), "Sector"],
+        values="Udzial",
+        color="Zmiana_pct",
+        color_continuous_scale=["#CC0000", "#353535", "#00CC00"],
+        custom_data=data[["Sector", "Zmiana_pct"]],
+    )
+
+    fig.update_traces(
+        insidetextfont=dict(
+            size=200,
+        ),
+        textfont=dict(size=40),
+        textposition="middle center",
+        texttemplate="<br>      %{customdata[0]}      <br><b>      %{customdata[1]:.2%}      </b>",
+        marker_line_width=3,
+        marker_line_color="#1a1a1a",
+        root=dict(color="#1a1a1a"),
+    )
+
+    fig.update_coloraxes(showscale=True, cmin=-0.05, cmax=0.05, cmid=0)
+
+    fig.update_layout(
+        margin=dict(t=200, l=5, r=5, b=120),
+        width=7680,
+        height=4320,
+        title=dict(
+            text=f"INDEKSY SEKTOROWE WIG ⁕ {start:%d/%m} - {end:%d/%m} * {week_nr}w{start:%Y}",
+            font=dict(
+                color="white",
+                size=150,
+            ),
+            yanchor="middle",
+            xanchor="center",
+            xref="paper",
+            yref="paper",
+            x=0.5,
+        ),
+        paper_bgcolor="#1a1a1a",
+        colorway=["#D9202E", "#AC1B26", "#7F151D", "#3B6323", "#518A30", "#66B13C"],
+        coloraxis_colorbar=dict(
+            title="",
+            thicknessmode="pixels",
+            thickness=130,
+            tickvals=[-0.049, 0.049],
+            ticktext=["-5% ", "+5%"],
+            orientation="v",
+            tickfont=dict(
+                color="white",
+                size=55,
+            ),
+            ticklabelposition="inside",
+        ),
+    )
+
+    fig.add_annotation(
+        text=("source: Yahoo Finance"),
+        x=0.90,
+        y=-0.023,
+        font=dict(family="Calibri", size=80, color="white"),
+        opacity=0.7,
+        align="left",
+    )
+
+    fig.add_annotation(
+        text=(dt.now(tzinfo).strftime(r"%Y/%m/%d %H:%M")),
+        x=0.1,
+        y=-0.025,  #
+        font=dict(family="Calibri", size=80, color="white"),
+        opacity=0.7,
+        align="left",
+    )
+
+    fig.add_annotation(
+        text=("@SliwinskiAlan"),
+        x=0.5,
+        y=-0.025,
+        font=dict(family="Calibri", size=80, color="white"),
+        opacity=0.7,
+        align="left",
+    )
+
+    # fig.show()
+    fig.write_image("wig_sectors_heatmap_1w_perf.png")
+
+    data = data.sort_values("Zmiana_pct", ascending=False, ignore_index=True)
+
+    data_string = ''
+    for indx, (sector, _, _, change) in data.iterrows():
+
+        if change > 0.005:
+            data_string += f"{indx + 1}. 🟢"
+        elif change > -0.005:
+            data_string += f"{indx + 1}. ➖"
+        else:
+            data_string += f"{indx + 1}. 🔴"
+
+        data_string += f" {sector:<6} -> {change:6.2%}\n"
+
+        if indx == 4:
+            break
+
+    return data_string
+
+
 def wig_do_chart():
     try:
         data = pd.read_html(
@@ -710,6 +864,8 @@ def wig_do_chart_1w_perf():
 
     df = pd.read_csv('wig_bot/wig.csv')
 
+    df.Ticker = df.Ticker + '.WA'
+
     prices = yq.Ticker(df.Ticker).history(period='1mo')[['adjclose']].reset_index()
 
     prices = prices.pivot(columns='symbol', index='date').droplevel(level=0, axis=1)
@@ -742,6 +898,8 @@ def wig_do_chart_1w_perf():
     data["udzial_zmiana_pct"] = data.Zmiana_pct * data.Udzial
 
     stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
+
+    data.Ticker = data.Ticker.str.removesuffix('.WA')
 
     fig = px.treemap(
         data,

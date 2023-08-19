@@ -78,6 +78,33 @@ def posting_wig_sectors_heatmap(client, api):
     pass
 
 
+def posting_wig_sectors_heatmap_1w_perf(client, api):
+    print("starting posting_wig_sectors_heatmap_1w_perf")
+
+    if not dni_opcje.is_good_day_to_post_option_charts():
+        print("dzisiaj bez postowania wig_sectors_heatmap_1w_perf")
+        return
+
+    data_string = wig_heatmaps.wig_sectors_do_chart_1w_perf()
+
+    text = f"""📈 INDEKSY SEKTOROWE WIG 1W 📉
+
+{data_string}
+
+#WIG #GPW #python
+"""
+
+    to_post = ["wig_sectors_heatmap_1w_perf.png"]
+    twitter.tweet_things(client, api, text, to_post)
+
+    for chart in to_post:
+        os.remove(chart)
+
+    print("wig_sectors_heatmap_1w_perf chart removed")
+
+    pass
+
+
 def posting_wig_heatmap(client, api):
     print(f"starting posting_wig_heatmap")
 
@@ -413,6 +440,23 @@ def main(client, api):
 
     else:
         print("posting_wig_heatmap_1w_perf zakonczone sukcesem")
+
+    time.sleep(60 * 5)
+    # w soboty postuj wig_sectors_heatmap_1w_perf
+    try:
+        if td.isoweekday() == 6:
+            posting_wig_sectors_heatmap_1w_perf(client, api)
+        else:
+            print("dzis bez postowania wig_sectors_heatmap_1w_perf")
+    except Exception as e:
+        print("\nposting_wig_sectors_heatmap_1w_perf ZAKONCZONE NIEPOWODZENIEM\n")
+        traceback.print_exception(e)
+        print()
+        clean_dir_from_pngs()
+        print("cleaned dir from pngs")
+
+    else:
+        print("posting_wig_sectors_heatmap_1w_perf zakonczone sukcesem")
 
     print("\nZAKONCZONO WIG20 MAIN\n")
 
