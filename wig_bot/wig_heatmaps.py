@@ -1,8 +1,10 @@
+from datetime import datetime as dt
+from datetime import timedelta, timezone
+
 import pandas as pd
-from matplotlib import pyplot as plt
-from datetime import datetime as dt, timedelta, timezone
 import plotly.express as px
 import yahooquery as yq
+from matplotlib import pyplot as plt
 
 plt.style.use("dark_background")
 
@@ -265,7 +267,7 @@ def wig_sectors_do_chart():
 
     data = data.sort_values("pakiet_zmiana", ascending=False, ignore_index=True)
 
-    data_string = ''
+    data_string = ""
     for indx, (sector, change, _) in data.iterrows():
         sector = sector.removeprefix("WIG-")
 
@@ -285,38 +287,39 @@ def wig_sectors_do_chart():
 
 
 def wig_sectors_do_chart_1w_perf():
-
     today = dt.today()
     week_nr = today.isocalendar().week
 
-    df = pd.read_csv('wig_bot/sectors.csv')
-    df.Ticker = df.Ticker + '.WA'
+    df = pd.read_csv("wig_bot/sectors.csv")
+    df.Ticker = df.Ticker + ".WA"
 
-    prices = yq.Ticker(df.Ticker).history(period='1mo')[['adjclose']].reset_index()
+    prices = yq.Ticker(df.Ticker).history(period="1mo")[["adjclose"]].reset_index()
 
-    prices = prices.pivot(columns='symbol', index='date').droplevel(level=0, axis=1)
+    prices = prices.pivot(columns="symbol", index="date").droplevel(level=0, axis=1)
 
     prices_chng = prices.reset_index()
     prices_chng.date = pd.to_datetime(prices_chng.date)
-    prices_chng['week_nr'] = prices_chng.date.dt.isocalendar().week
+    prices_chng["week_nr"] = prices_chng.date.dt.isocalendar().week
     b = prices_chng[prices_chng.week_nr == week_nr]
-    a = prices_chng[(prices_chng.week_nr == 52) | (prices_chng.week_nr == week_nr - 1)].tail(1)
+    a = prices_chng[
+        (prices_chng.week_nr == 52) | (prices_chng.week_nr == week_nr - 1)
+    ].tail(1)
     prices_chng = pd.concat([a, b])
 
     start, end = prices_chng.date.iloc[1], prices_chng.date.iloc[-1]
 
-    prices_chng = prices_chng.drop(columns=['date', 'week_nr'])
+    prices_chng = prices_chng.drop(columns=["date", "week_nr"])
 
     prices_chng = (prices_chng.pct_change() + 1).cumprod() - 1
 
     prices_chng = prices_chng.tail(1).T.reset_index()
-    prices_chng.columns = ['Ticker', 'Zmiana_pct']
+    prices_chng.columns = ["Ticker", "Zmiana_pct"]
 
     kurs = prices.tail(1).T.reset_index()
-    kurs.columns = ['Ticker', 'Kurs']
+    kurs.columns = ["Ticker", "Kurs"]
 
-    full = pd.merge(df, prices_chng, on='Ticker')
-    data = pd.merge(full, kurs, on='Ticker')
+    full = pd.merge(df, prices_chng, on="Ticker")
+    data = pd.merge(full, kurs, on="Ticker")
 
     data["Udzial"] = data.Kurs * data.Pakiet
 
@@ -328,9 +331,9 @@ def wig_sectors_do_chart_1w_perf():
 
     data.reset_index(inplace=True)
 
-    data['Zmiana_pct'] = data.udzial_zmiana_pct / data.Udzial
+    data["Zmiana_pct"] = data.udzial_zmiana_pct / data.Udzial
 
-    data.Sector = data.Sector.str.removeprefix('WIG-')
+    data.Sector = data.Sector.str.removeprefix("WIG-")
 
     fig = px.treemap(
         data,
@@ -420,9 +423,8 @@ def wig_sectors_do_chart_1w_perf():
 
     data = data.sort_values("Zmiana_pct", ascending=False, ignore_index=True)
 
-    data_string = ''
+    data_string = ""
     for indx, (sector, _, _, change) in data.iterrows():
-
         if change > 0.005:
             data_string += f"{indx + 1}. 🟢"
         elif change > -0.005:
@@ -858,40 +860,41 @@ def wig_do_chart_1m_perf():
 
 
 def wig_do_chart_1w_perf():
-
     today = dt.today()
     week_nr = today.isocalendar().week
 
-    df = pd.read_csv('wig_bot/wig.csv')
+    df = pd.read_csv("wig_bot/wig.csv")
 
-    df.Ticker = df.Ticker + '.WA'
+    df.Ticker = df.Ticker + ".WA"
 
-    prices = yq.Ticker(df.Ticker).history(period='1mo')[['adjclose']].reset_index()
+    prices = yq.Ticker(df.Ticker).history(period="1mo")[["adjclose"]].reset_index()
 
-    prices = prices.pivot(columns='symbol', index='date').droplevel(level=0, axis=1)
+    prices = prices.pivot(columns="symbol", index="date").droplevel(level=0, axis=1)
 
     prices_chng = prices.reset_index()
     prices_chng.date = pd.to_datetime(prices_chng.date)
-    prices_chng['week_nr'] = prices_chng.date.dt.isocalendar().week
+    prices_chng["week_nr"] = prices_chng.date.dt.isocalendar().week
     b = prices_chng[prices_chng.week_nr == week_nr]
-    a = prices_chng[(prices_chng.week_nr == 52) | (prices_chng.week_nr == week_nr - 1)].tail(1)
+    a = prices_chng[
+        (prices_chng.week_nr == 52) | (prices_chng.week_nr == week_nr - 1)
+    ].tail(1)
     prices_chng = pd.concat([a, b])
 
     start, end = prices_chng.date.iloc[1], prices_chng.date.iloc[-1]
 
-    prices_chng = prices_chng.drop(columns=['date', 'week_nr'])
+    prices_chng = prices_chng.drop(columns=["date", "week_nr"])
 
     prices_chng = (prices_chng.pct_change() + 1).cumprod() - 1
 
     prices_chng = prices_chng.tail(1).T.reset_index()
-    prices_chng.columns = ['Ticker', 'Zmiana_pct']
-    prices_chng.Ticker = prices_chng.Ticker.str.removesuffix('.WA')
+    prices_chng.columns = ["Ticker", "Zmiana_pct"]
+    prices_chng.Ticker = prices_chng.Ticker.str.removesuffix(".WA")
 
     kurs = prices.tail(1).T.reset_index()
-    kurs.columns = ['Ticker', 'Kurs']
+    kurs.columns = ["Ticker", "Kurs"]
 
-    full = pd.merge(df, prices_chng, on='Ticker')
-    data = pd.merge(full, kurs, on='Ticker')
+    full = pd.merge(df, prices_chng, on="Ticker")
+    data = pd.merge(full, kurs, on="Ticker")
 
     data["Udzial"] = data.Kurs * data.Pakiet
 
@@ -899,7 +902,7 @@ def wig_do_chart_1w_perf():
 
     stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
 
-    data.Ticker = data.Ticker.str.removesuffix('.WA')
+    data.Ticker = data.Ticker.str.removesuffix(".WA")
 
     fig = px.treemap(
         data,

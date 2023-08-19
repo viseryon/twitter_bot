@@ -1,11 +1,12 @@
 if __name__ == "__main__":
-    import wig20_options
-    import analysts_pts
     import analyst_rec
-    import twitter
-    import option_mispricing
-    import wig_bot.wig_heatmaps as wig_heatmaps
+    import analysts_pts
     import dni_opcje
+    import option_mispricing
+    import wig20_options
+
+    import twitter
+    import wig_bot.wig_heatmaps as wig_heatmaps
 else:
     from . import wig20_options
     from . import analysts_pts
@@ -15,13 +16,15 @@ else:
     from . import wig_heatmaps
     from . import dni_opcje
 
-import pandas as pd
+import os
 import time
 import traceback
-import os
-import numpy as np
-from datetime import timedelta, datetime as dt
 from calendar import monthrange
+from datetime import datetime as dt
+from datetime import timedelta
+
+import numpy as np
+import pandas as pd
 
 
 def posting_wig20_heatmap(client, api):
