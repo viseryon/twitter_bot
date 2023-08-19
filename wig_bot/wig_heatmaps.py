@@ -703,5 +703,168 @@ def wig_do_chart_1m_perf():
     return data_string
 
 
+def wig_do_chart_1w_perf():
+
+    today = dt.today()
+    week_nr = today.isocalendar().week
+
+    df = pd.read_csv('wig_bot/wig.csv')
+
+    prices = yq.Ticker(df.Ticker).history(period='1mo')[['adjclose']].reset_index()
+
+    prices = prices.pivot(columns='symbol', index='date').droplevel(level=0, axis=1)
+
+    prices_chng = prices.reset_index()
+    prices_chng.date = pd.to_datetime(prices_chng.date)
+    prices_chng['week_nr'] = prices_chng.date.dt.isocalendar().week
+    b = prices_chng[prices_chng.week_nr == week_nr]
+    a = prices_chng[(prices_chng.week_nr == 52) | (prices_chng.week_nr == week_nr - 1)].tail(1)
+    prices_chng = pd.concat([a, b])
+
+    start, end = prices_chng.date.iloc[1], prices_chng.date.iloc[-1]
+
+    prices_chng = prices_chng.drop(columns=['date', 'week_nr'])
+
+    prices_chng = (prices_chng.pct_change() + 1).cumprod() - 1
+
+    prices_chng = prices_chng.tail(1).T.reset_index()
+    prices_chng.columns = ['Ticker', 'Zmiana_pct']
+    prices_chng.Ticker = prices_chng.Ticker.str.removesuffix('.WA')
+
+    kurs = prices.tail(1).T.reset_index()
+    kurs.columns = ['Ticker', 'Kurs']
+
+    full = pd.merge(df, prices_chng, on='Ticker')
+    data = pd.merge(full, kurs, on='Ticker')
+
+    data["Udzial"] = data.Kurs * data.Pakiet
+
+    data["udzial_zmiana_pct"] = data.Zmiana_pct * data.Udzial
+
+    stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
+
+    fig = px.treemap(
+        data,
+        path=[px.Constant("WIG"), "Sector", "Industry", "Ticker"],
+        values="Udzial",
+        color="Zmiana_pct",
+        hover_name="Nazwa",
+        color_continuous_scale=["#CC0000", "#353535", "#00CC00"],
+        hover_data=["Kurs", "Zmiana_pct"],
+        custom_data=data[["Zmiana_pct", "Nazwa", "Ticker", "Kurs", "Sector"]],
+    )
+
+    fig.update_traces(
+        hovertemplate="<b>%{customdata[4]}</b><br><br>"
+        + "<b>%{customdata[2]}</b> %{customdata[3]:.2f} %{customdata[0]:.2%}<br>"
+        + "%{customdata[1]}",
+        insidetextfont=dict(
+            size=120,
+        ),
+        textfont=dict(size=40),
+        textposition="middle center",
+        texttemplate="<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>",
+        hoverlabel=dict(
+            bgcolor="#444444", bordercolor="gold", font=dict(color="white", size=16)
+        ),
+        marker_line_width=3,
+        marker_line_color="#1a1a1a",
+        root=dict(color="#1a1a1a"),
+    )
+
+    fig.update_coloraxes(
+        showscale=True,
+        cmin=-0.07,
+        cmax=0.07,
+        cmid=0,
+    )
+
+    fig.update_layout(
+        margin=dict(t=200, l=5, r=5, b=120),
+        width=7680,
+        height=4320,
+        title=dict(
+            text=f"INDEX WIG ⁕ {stat_chng:.2%} ⁕ {start:%d/%m} - {end:%d/%m} * {week_nr}w{start:%Y}",
+            font=dict(
+                color="white",
+                size=150,
+            ),
+            yanchor="middle",
+            xanchor="center",
+            xref="paper",
+            yref="paper",
+            x=0.5,
+        ),
+        paper_bgcolor="#1a1a1a",
+        colorway=["#D9202E", "#AC1B26", "#7F151D", "#3B6323", "#518A30", "#66B13C"],
+    )
+
+    fig.add_annotation(
+        text=("source: bankier.com"),
+        x=0.90,
+        y=-0.023,  #
+        font=dict(family="Calibri", size=80, color="white"),
+        opacity=0.7,
+        align="left",
+    )
+
+    fig.add_annotation(
+        text=(dt.now(tzinfo).strftime(r"%Y/%m/%d %H:%M")),
+        x=0.1,
+        y=-0.025,
+        font=dict(family="Calibri", size=80, color="white"),
+        opacity=0.7,
+        align="left",
+    )
+
+    fig.add_annotation(
+        text=("@SliwinskiAlan"),
+        x=0.5,
+        y=-0.025,
+        font=dict(family="Calibri", size=80, color="white"),
+        opacity=0.7,
+        align="left",
+    )
+
+    # fig.show()
+    fig.write_image("wig_heatmap_1w_perf.png")
+
+    data["udzial_zmiana_pct"] = data.Udzial * data.Zmiana_pct
+    sectors_change = (
+        data.groupby("Sector")["udzial_zmiana_pct"].sum()
+        / data.groupby("Sector")["Udzial"].sum()
+    )
+
+    sectors_change = sectors_change.sort_values(ascending=False)
+    data = data.sort_values("Zmiana_pct", ascending=False)
+
+    data_string = f"\nWIG perf 1W: {stat_chng:.2%}"
+
+    if stat_chng > 0.05:
+        data_string += " 🟢🟢🟢\n"
+    elif stat_chng > 0.03:
+        data_string += " 🟢🟢\n"
+    elif stat_chng > 0.01:
+        data_string += " 🟢\n"
+    elif stat_chng > -0.01:
+        data_string += " ➖\n"
+    elif stat_chng > -0.03:
+        data_string += " 🔴\n"
+    elif stat_chng > -0.05:
+        data_string += " 🔴🔴\n"
+    else:
+        data_string += " 🔴🔴🔴\n"
+
+    data = data.dropna()
+
+    data_string += f"\n🟢 {data.Ticker.iloc[0]} {data.Nazwa.iloc[0]} {data.Zmiana_pct.iloc[0]:.2%}\n🔴 {data.Ticker.iloc[-1]} {data.Nazwa.iloc[-1]} {data.Zmiana_pct.iloc[-1]:.2%}\n\n"
+
+    for i, (sector, change) in enumerate(sectors_change.items()):
+        if i < 3:
+            data_string += f"{i+1}. {sector} ->{change:>7.2%}\n"
+
+    return data_string
+
+
 if __name__ == "__main__":
     wig20_do_chart()

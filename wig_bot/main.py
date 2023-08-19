@@ -133,6 +133,25 @@ def posting_wig_heatmap_1m_perf(client, api):
     pass
 
 
+def posting_wig_heatmap_1w_perf(client, api):
+    print("starting posting_wig_heatmap_1w_perf")
+
+    data_string = wig_heatmaps.wig_do_chart_1w_perf()
+
+    text = f"""📈 WIG HEATMAP WEEK {dt.now():%W} 📉
+{data_string}
+#WIG20 #WIG #index #giełda #GPW #python #project
+"""
+
+    to_post = ["wig_heatmap_1w_perf.png"]
+    twitter.tweet_things(client, api, text, to_post)
+
+    for chart in to_post:
+        os.remove(chart)
+
+    print("wig_heatmap_1w_perf chart removed")
+
+
 def posting_option_mispricing(client, api):
     print("starting posting_option_mispricing")
 
@@ -377,6 +396,23 @@ def main(client, api):
             print("posting_wig_heatmap_1m_perf zakonczone sukcesem")
     else:
         print("dzisiaj bez postowania wig_heatmap_1m_perf")
+
+    time.sleep(60 * 5)
+    # w soboty postuj wig_heatmap_1w_perf
+    try:
+        if td.isoweekday() == 6:
+            posting_wig_heatmap_1w_perf(client, api)
+        else:
+            print("dzis bez postowania wig_heatmap_1w_perf")
+    except Exception as e:
+        print("\nposting_wig_heatmap_1w_perf ZAKONCZONE NIEPOWODZENIEM\n")
+        traceback.print_exception(e)
+        print()
+        clean_dir_from_pngs()
+        print("cleaned dir from pngs")
+
+    else:
+        print("posting_wig_heatmap_1w_perf zakonczone sukcesem")
 
     print("\nZAKONCZONO WIG20 MAIN\n")
 
