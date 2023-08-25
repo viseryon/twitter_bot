@@ -466,14 +466,13 @@ def wig_do_chart():
 
     stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
 
-    ticker_sector_industry = pd.read_csv('wig.csv')[['Ticker', 'Sector', 'Industry']]
+    ticker_sector_industry = pd.read_csv("wig.csv")[["Ticker", "Sector", "Industry"]]
 
-    data = pd.merge(data, ticker_sector_industry, how='left', on='Ticker')
+    data = pd.merge(data, ticker_sector_industry, how="left", on="Ticker")
 
-    empty_tickers = data[data.Sector.isna()].Ticker + '.WA'
+    empty_tickers = data[data.Sector.isna()].Ticker + ".WA"
 
     if not empty_tickers.empty:
-
         empty_tickers_summary_profile = yq.Ticker(empty_tickers).summary_profile
         sector, industry = [], []
         for v in empty_tickers_summary_profile.values():
@@ -518,8 +517,8 @@ def wig_do_chart():
         industry = [rn.get(ind, ind) for ind in industry]
 
         for indx, sec, inds in zip(empty_tickers.index, sector, industry):
-            data.loc[indx, 'Sector'] = sec
-            data.loc[indx, 'Industry'] = inds
+            data.loc[indx, "Sector"] = sec
+            data.loc[indx, "Industry"] = inds
 
     fig = px.treemap(
         data,
