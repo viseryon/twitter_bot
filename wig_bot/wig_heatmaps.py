@@ -466,55 +466,60 @@ def wig_do_chart():
 
     stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
 
-    tickers = data.Ticker.to_list()
-    tickers = [f"{tick}.WA" for tick in tickers]
+    ticker_sector_industry = pd.read_csv('wig.csv')[['Ticker', 'Sector', 'Industry']]
 
-    yq_data = yq.Ticker(tickers).summary_profile
+    data = pd.merge(data, ticker_sector_industry, how='left', on='Ticker')
 
-    sector, industry = [], []
-    for v in yq_data.values():
-        sector.append(v["sector"])
-        industry.append(v["industry"])
+    empty_tickers = data[data.Sector.isna()].Ticker + '.WA'
 
-    rn = {
-        "Financial Data & Stock Exchanges": "Financial Data<br>Stock Exchanges",
-        "Utilities—Regulated Gas": "Regulated Gas",
-        "Utilities—Independent Power Producers": "Independent<br>Power Producers",
-        "Utilities—Renewable": "Renewable",
-        "Utilities—Regulated Electric": "Regulated Electric",
-        "Real Estate—Diversified": "Diversified",
-        "Real Estate Services": "Services",
-        "Real Estate—Development": "Development",
-        "Farm & Heavy Construction Machinery": "Farm & Heavy<br>Construction Machinery",
-        "Staffing & Employment Services": "Staffing & Employment<br>Services",
-        "Tools & Accessories": "Tools<br>& Accessories",
-        "Building Products & Equipment": "Building Products<br>& Equipment",
-        "Integrated Freight & Logistics": "Integrated Freight<br>& Logistics",
-        "Specialty Industrial Machinery": "Specialty<br>Industrial Machinery",
-        "Electrical Equipment & Parts": "Electrical Equipment<br>& Parts",
-        "Metal Fabrication": "Metal<br>Fabrication",
-        "Aerospace & Defense": "Aerospace<br>& Defense",
-        "Paper & Paper Products": "Paper<br>& Paper Products",
-        "Specialty Chemicals": "Specialty<br>Chemicals",
-        "Specialty Business Services": "Specialty<br>Business Services",
-        "Drug Manufacturers—Specialty & Generic": "Drug Manufacturers<br>Specialty & Generic",
-        "Medical Care Facilities": "Medical Care<br>Facilities",
-        "Medical Instruments & Supplies": "Medical Instruments<br>& Supplies",
-        "Pharmaceutical Retailers": "Pharmaceutical<br>Retailers",
-        "Electronic Components": "Electronic<br>Components",
-        "Scientific & Technical Instruments": "Scientific & Technical<br>Instruments",
-        "Electronics & Computer Distribution": "Electronics<br>& Computer Distribution",
-        "Furnishings, Fixtures & Appliances": "Furnishings, Fixtures<br>& Appliances",
-        "Travel Services": "Travel<br<Services",
-        "Information Technology Services": "Information Technology<br>Services",
-        "Software—Infrastructure": "Software<br>Infrastructure",
-        "Medical Devices": "Medical<br>Devices",
-    }
+    if not empty_tickers.empty:
 
-    industry = [rn.get(ind, ind) for ind in industry]
+        empty_tickers_summary_profile = yq.Ticker(empty_tickers).summary_profile
+        sector, industry = [], []
+        for v in empty_tickers_summary_profile.values():
+            sector.append(v["sector"])
+            industry.append(v["industry"])
 
-    data["Sector"] = sector
-    data["Industry"] = industry
+        rn = {
+            "Financial Data & Stock Exchanges": "Financial Data<br>Stock Exchanges",
+            "Utilities—Regulated Gas": "Regulated Gas",
+            "Utilities—Independent Power Producers": "Independent<br>Power Producers",
+            "Utilities—Renewable": "Renewable",
+            "Utilities—Regulated Electric": "Regulated Electric",
+            "Real Estate—Diversified": "Diversified",
+            "Real Estate Services": "Services",
+            "Real Estate—Development": "Development",
+            "Farm & Heavy Construction Machinery": "Farm & Heavy<br>Construction Machinery",
+            "Staffing & Employment Services": "Staffing & Employment<br>Services",
+            "Tools & Accessories": "Tools<br>& Accessories",
+            "Building Products & Equipment": "Building Products<br>& Equipment",
+            "Integrated Freight & Logistics": "Integrated Freight<br>& Logistics",
+            "Specialty Industrial Machinery": "Specialty<br>Industrial Machinery",
+            "Electrical Equipment & Parts": "Electrical Equipment<br>& Parts",
+            "Metal Fabrication": "Metal<br>Fabrication",
+            "Aerospace & Defense": "Aerospace<br>& Defense",
+            "Paper & Paper Products": "Paper<br>& Paper Products",
+            "Specialty Chemicals": "Specialty<br>Chemicals",
+            "Specialty Business Services": "Specialty<br>Business Services",
+            "Drug Manufacturers—Specialty & Generic": "Drug Manufacturers<br>Specialty & Generic",
+            "Medical Care Facilities": "Medical Care<br>Facilities",
+            "Medical Instruments & Supplies": "Medical Instruments<br>& Supplies",
+            "Pharmaceutical Retailers": "Pharmaceutical<br>Retailers",
+            "Electronic Components": "Electronic<br>Components",
+            "Scientific & Technical Instruments": "Scientific & Technical<br>Instruments",
+            "Electronics & Computer Distribution": "Electronics<br>& Computer Distribution",
+            "Furnishings, Fixtures & Appliances": "Furnishings, Fixtures<br>& Appliances",
+            "Travel Services": "Travel<br<Services",
+            "Information Technology Services": "Information Technology<br>Services",
+            "Software—Infrastructure": "Software<br>Infrastructure",
+            "Medical Devices": "Medical<br>Devices",
+        }
+
+        industry = [rn.get(ind, ind) for ind in industry]
+
+        for indx, sec, inds in zip(empty_tickers.index, sector, industry):
+            data.loc[indx, 'Sector'] = sec
+            data.loc[indx, 'Industry'] = inds
 
     fig = px.treemap(
         data,
