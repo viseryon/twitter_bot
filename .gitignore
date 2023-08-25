@@ -1,3 +1,4 @@
+.gitignore
 /makro_bot/testy.ipynb
 /makro_bot/__pycache__
 /makro_bot/testy2.ipynb
