@@ -290,7 +290,7 @@ def wig_sectors_do_chart_1w_perf():
     today = dt.today()
     week_nr = today.isocalendar().week
 
-    df = pd.read_csv("sectors.csv")
+    df = pd.read_csv("wig_bot\sectors.csv")
     df.Ticker = df.Ticker + ".WA"
 
     prices = yq.Ticker(df.Ticker).history(period="1mo")[["adjclose"]].reset_index()
@@ -466,7 +466,7 @@ def wig_do_chart():
 
     stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
 
-    ticker_sector_industry = pd.read_csv("wig.csv")[["Ticker", "Sector", "Industry"]]
+    ticker_sector_industry = pd.read_csv("wig_bot\wig.csv")[["Ticker", "Sector", "Industry"]]
 
     data = pd.merge(data, ticker_sector_industry, how="left", on="Ticker")
 
@@ -867,7 +867,7 @@ def wig_do_chart_1w_perf():
     today = dt.today()
     week_nr = today.isocalendar().week
 
-    df = pd.read_csv("wig.csv")
+    df = pd.read_csv("wig_bot\wig.csv")
 
     df.Ticker = df.Ticker + ".WA"
 
