@@ -1,9 +1,11 @@
-import yahooquery as yq
+from datetime import datetime as dt
+from datetime import timedelta
+
 import matplotlib.pyplot as plt
-from matplotlib.ticker import StrMethodFormatter
-import pandas as pd
-from datetime import timedelta, datetime as dt
 import numpy as np
+import pandas as pd
+import yahooquery as yq
+from matplotlib.ticker import StrMethodFormatter
 
 plt.style.use("dark_background")
 

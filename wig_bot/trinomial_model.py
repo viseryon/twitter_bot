@@ -1,8 +1,9 @@
 import math
+
 import numpy as np
 
-def crr_trinomial_tree(S, K, r, T, t, v, c_p):
 
+def crr_trinomial_tree(S, K, r, T, t, v, c_p):
     # S  : spot price
     # K  : strike
     # r  : riskless rate
@@ -26,28 +27,30 @@ def crr_trinomial_tree(S, K, r, T, t, v, c_p):
 
     # Initialize tree parameters
     u = math.exp(v * math.sqrt(2 * dt))
-    d = 1/u
+    d = 1 / u
     m = 1
 
     # Pu
-    pu = ((math.exp(r*dt/2) - math.exp(-1*v*math.sqrt(dt/2))) /
-          (math.exp(v*math.sqrt(dt/2)) - math.exp(-1*v*math.sqrt(dt/2))))**2
+    pu = (
+        (math.exp(r * dt / 2) - math.exp(-1 * v * math.sqrt(dt / 2)))
+        / (math.exp(v * math.sqrt(dt / 2)) - math.exp(-1 * v * math.sqrt(dt / 2)))
+    ) ** 2
     # Pd
-    pd = ((math.exp(v*math.sqrt(dt/2)) - math.exp(r*dt/2)) /
-          (math.exp(v*math.sqrt(dt/2)) - math.exp(-1*v*math.sqrt(dt/2))))**2
+    pd = (
+        (math.exp(v * math.sqrt(dt / 2)) - math.exp(r * dt / 2))
+        / (math.exp(v * math.sqrt(dt / 2)) - math.exp(-1 * v * math.sqrt(dt / 2)))
+    ) ** 2
     # Pm
     pm = 1 - (pu + pd)
 
-    for row in range(0, 2*t + 1):
-
-        St = S * u**(max(t - row, 0)) * d**(max(row - t, 0))
+    for row in range(0, 2 * t + 1):
+        St = S * u ** (max(t - row, 0)) * d ** (max(row - t, 0))
         crrTree[row, 0] = max(x * St - x * K, 0)
 
-    for col in range(t-1, -1, -1):
-        for row in range(0, col*2+1):
-
+    for col in range(t - 1, -1, -1):
+        for row in range(0, col * 2 + 1):
             # move backwards from previous prices
-            Su = crrTree[row,  0]
+            Su = crrTree[row, 0]
             Sm = crrTree[row + 1, 0]
             Sd = crrTree[row + 2, 0]
             # Calcuate price on tree
