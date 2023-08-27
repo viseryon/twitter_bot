@@ -84,10 +84,6 @@ def posting_wig_sectors_heatmap(client, api):
 def posting_wig_sectors_heatmap_1w_perf(client, api):
     print("starting posting_wig_sectors_heatmap_1w_perf")
 
-    if not dni_opcje.is_good_day_to_post_option_charts():
-        print("dzisiaj bez postowania wig_sectors_heatmap_1w_perf")
-        return
-
     data_string = wig_heatmaps.wig_sectors_do_chart_1w_perf()
 
     text = f"""📈 INDEKSY SEKTOROWE WIG 1W 📉
