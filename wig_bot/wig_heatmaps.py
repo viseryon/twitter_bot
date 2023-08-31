@@ -673,7 +673,7 @@ def wig_do_chart_1m_perf():
     start = (dt(dt.today().year, dt.today().month, 1) + timedelta(-1)).strftime(
         "%Y-%m-%d"
     )
-    end = (dt.today().date() + timedelta(1)).strftime("%Y-%m-%d")
+    end = (dt.today().date()).strftime("%Y-%m-%d")
     yq_data = stonks.history(start=start, end=end)
 
     yq_data = yq_data.reset_index()[["symbol", "date", "adjclose"]]

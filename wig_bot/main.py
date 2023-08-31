@@ -408,7 +408,7 @@ def main(client, api):
 
     # ostatniego dnia msc rob wig_heatmap_1m_perf
     time.sleep(60 * 5)
-    if is_last_day_of_month():
+    if td.day == 1:
         try:
             posting_wig_heatmap_1m_perf(client, api)
         except Exception as e:
