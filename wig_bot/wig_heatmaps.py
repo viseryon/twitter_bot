@@ -466,7 +466,7 @@ def wig_do_chart():
 
     stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
 
-    ticker_sector_industry = pd.read_csv("wig_bot/wig.csv")[["Ticker", "Sector", "Industry"]]
+    ticker_sector_industry = pd.read_csv("wig_bot//wig.csv")[["Ticker", "Sector", "Industry"]]
 
     data = pd.merge(data, ticker_sector_industry, how="left", on="Ticker")
 
