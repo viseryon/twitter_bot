@@ -5,11 +5,26 @@ import pandas as pd
 import plotly.express as px
 import yahooquery as yq
 from matplotlib import pyplot as plt
+from pathlib import Path
 
 plt.style.use("dark_background")
 
 timezone_offset = 2.0  # CET Warsaw
 tzinfo = timezone(timedelta(hours=timezone_offset))
+
+def get_path(file_name) -> str:
+    """returns a path for a file
+
+    Args:
+        file_name (str): just a file name
+
+    Returns:
+        str: path of that file
+    """
+    path = Path(__file__).parent
+    file = Path(file_name)
+    
+    return str(path / file)
 
 
 def wig20_do_chart():
@@ -290,7 +305,8 @@ def wig_sectors_do_chart_1w_perf():
     today = dt.today()
     week_nr = today.isocalendar().week
 
-    df = pd.read_csv("wig_bot/sectors.csv")
+    path = get_path('sectors.csv')
+    df = pd.read_csv(path)
     df.Ticker = df.Ticker + ".WA"
 
     prices = yq.Ticker(df.Ticker).history(period="1mo")[["adjclose"]].reset_index()
@@ -466,7 +482,8 @@ def wig_do_chart():
 
     stat_chng = data.udzial_zmiana_pct.sum() / data.Udzial.sum()
 
-    ticker_sector_industry = pd.read_csv("wig_bot//wig.csv")[["Ticker", "Sector", "Industry"]]
+    path = get_path('wig.csv')
+    ticker_sector_industry = pd.read_csv(path)[["Ticker", "Sector", "Industry"]]
 
     data = pd.merge(data, ticker_sector_industry, how="left", on="Ticker")
 
@@ -867,7 +884,8 @@ def wig_do_chart_1w_perf():
     today = dt.today()
     week_nr = today.isocalendar().week
 
-    df = pd.read_csv("wig_bot/wig.csv")
+    path = get_path('wig.csv')
+    df = pd.read_csv(path)
 
     df.Ticker = df.Ticker + ".WA"
 
