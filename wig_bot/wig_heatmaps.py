@@ -910,10 +910,13 @@ def wig_do_chart_1w_perf():
 
     prices_chng = prices_chng.tail(1).T.reset_index()
     prices_chng.columns = ["Ticker", "Zmiana_pct"]
-    prices_chng.Ticker = prices_chng.Ticker.str.removesuffix(".WA")
 
     kurs = prices.tail(1).T.reset_index()
     kurs.columns = ["Ticker", "Kurs"]
+
+    df.Ticker = df.Ticker.str.removesuffix('.WA')
+    kurs.Ticker = kurs.Ticker.str.removesuffix('.WA')
+    prices_chng.Ticker = prices_chng.Ticker.str.removesuffix(".WA")
 
     full = pd.merge(df, prices_chng, on="Ticker")
     data = pd.merge(full, kurs, on="Ticker")
