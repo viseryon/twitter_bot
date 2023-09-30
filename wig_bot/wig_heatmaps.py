@@ -816,7 +816,7 @@ def wig_do_chart_1m_perf():
     )
 
     fig.add_annotation(
-        text=("source: bankier.com, finance.yaahoo.com"),
+        text=("source: Yahoo Finance"),
         x=0.90,
         y=-0.023,
         font=dict(family="Calibri", size=80, color="white"),
@@ -986,7 +986,7 @@ def wig_do_chart_1w_perf():
     )
 
     fig.add_annotation(
-        text=("source: bankier.com"),
+        text=("source: Yahoo Finance"),
         x=0.90,
         y=-0.023,  #
         font=dict(family="Calibri", size=80, color="white"),
