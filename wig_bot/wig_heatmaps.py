@@ -57,9 +57,7 @@ def wig20_do_chart():
         path=[px.Constant("     "), "Ticker"],
         values="Udzial",
         color="Zmiana_pct",
-        hover_name="Nazwa",
         color_continuous_scale=["#CC0000", "#353535", "#00CC00"],
-        hover_data=["Kurs", "Zmiana_pct"],
         custom_data=data[["Zmiana_pct", "Nazwa", "Ticker", "Kurs"]],
     )
 
@@ -70,9 +68,6 @@ def wig20_do_chart():
         textfont=dict(size=40),
         textposition="middle center",
         texttemplate="<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>",
-        hoverlabel=dict(
-            bgcolor="#444444", bordercolor="gold", font=dict(color="white", size=16)
-        ),
         marker_line_width=3,
         marker_line_color="#1a1a1a",
         root=dict(color="#1a1a1a"),
@@ -542,25 +537,17 @@ def wig_do_chart():
         path=[px.Constant("WIG"), "Sector", "Industry", "Ticker"],
         values="Udzial",
         color="Zmiana_pct",
-        hover_name="Nazwa",
         color_continuous_scale=["#CC0000", "#353535", "#00CC00"],
-        hover_data=["Kurs", "Zmiana_pct"],
         custom_data=data[["Zmiana_pct", "Nazwa", "Ticker", "Kurs", "Sector"]],
     )
 
     fig.update_traces(
-        hovertemplate="<b>%{customdata[4]}</b><br><br>"
-        + "<b>%{customdata[2]}</b> %{customdata[3]:.2f} %{customdata[0]:.2%}<br>"
-        + "%{customdata[1]}",
         insidetextfont=dict(
             size=120,
         ),
         textfont=dict(size=40),
         textposition="middle center",
         texttemplate="<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>",
-        hoverlabel=dict(
-            bgcolor="#444444", bordercolor="gold", font=dict(color="white", size=16)
-        ),
         marker_line_width=3,
         marker_line_color="#1a1a1a",
         root=dict(color="#1a1a1a"),
@@ -764,25 +751,17 @@ def wig_do_chart_1m_perf():
         path=[px.Constant("WIG"), "Sector", "Ticker"],
         values="Udzial",
         color="Zmiana_pct",
-        hover_name="Nazwa",
         color_continuous_scale=["#CC0000", "#353535", "#00CC00"],
-        hover_data=["Kurs", "Zmiana_pct"],
         custom_data=data[["Zmiana_pct", "Nazwa", "Ticker", "Kurs", "Sector"]],
     )
 
     fig.update_traces(
-        hovertemplate="<b>%{customdata[4]}</b><br><br>"
-        + "<b>%{customdata[2]}</b> %{customdata[3]:.2f} %{customdata[0]:.2%}<br>"
-        + "%{customdata[1]}",
         insidetextfont=dict(
             size=120,
         ),
         textfont=dict(size=40),
         textposition="middle center",
         texttemplate="<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>",
-        hoverlabel=dict(
-            bgcolor="#444444", bordercolor="gold", font=dict(color="white", size=16)
-        ),
         marker_line_width=3,
         marker_line_color="#1a1a1a",
         root=dict(color="#1a1a1a"),
@@ -934,25 +913,17 @@ def wig_do_chart_1w_perf():
         path=[px.Constant("WIG"), "Sector", "Industry", "Ticker"],
         values="Udzial",
         color="Zmiana_pct",
-        hover_name="Nazwa",
         color_continuous_scale=["#CC0000", "#353535", "#00CC00"],
-        hover_data=["Kurs", "Zmiana_pct"],
         custom_data=data[["Zmiana_pct", "Nazwa", "Ticker", "Kurs", "Sector"]],
     )
 
     fig.update_traces(
-        hovertemplate="<b>%{customdata[4]}</b><br><br>"
-        + "<b>%{customdata[2]}</b> %{customdata[3]:.2f} %{customdata[0]:.2%}<br>"
-        + "%{customdata[1]}",
         insidetextfont=dict(
             size=120,
         ),
         textfont=dict(size=40),
         textposition="middle center",
         texttemplate="<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>",
-        hoverlabel=dict(
-            bgcolor="#444444", bordercolor="gold", font=dict(color="white", size=16)
-        ),
         marker_line_width=3,
         marker_line_color="#1a1a1a",
         root=dict(color="#1a1a1a"),
