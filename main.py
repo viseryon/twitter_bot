@@ -1,5 +1,4 @@
 import keys
-import makro_bot.main as makro_main
 import twitter
 import wig_bot.main as wig_main
 
