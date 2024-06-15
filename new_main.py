@@ -1,20 +1,32 @@
+import os
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import yahooquery as yq
+from matplotlib import pyplot as plt
 from tweepy import API, Client, OAuth1UserHandler
+
+import keys
+
+plt.style.use("dark_background")
+
+os.chdir(Path(__file__).parent)
 
 
 class TwitterBot:
     def __init__(self) -> None:
-        client, api = self.auth()
-        self.client: Client = client
-        self.api: API = api
+        # client, api = self.auth()
+        # self.client: Client = client
+        # self.api: API = api
 
         wig_components = self._get_wig_components()
         self.wig_components: pd.DataFrame = wig_components
-        self.tickers: list = wig_components.tickers.to_list()
+        self.tickers: list = wig_components.ticker.to_list()
 
-        self.prices = self._get_data()
+        # self.prices = self._get_data()
 
     def _au(
         self, bearer_token, api_key, api_secret, access_token, access_token_secret
@@ -53,7 +65,7 @@ class TwitterBot:
         else:
             self.client.create_tweet(text=text)
 
-    def _get_data(self):
+    def _get_data(self) -> pd.DataFrame:
 
         tickers = yq.Ticker(self.tickers)
         self._yq_tickers = tickers
@@ -100,19 +112,39 @@ class TwitterBot:
             saved_components, updated_components, how="right", on=["company", "ISIN"]
         )
 
-        # check empty tickers
-        empty_tickers = full_components[full_components.ticker.isna()]
-        if not empty_tickers.empty:
+        # check for empty data
+        empty_data = full_components[full_components.isnull().any(axis=1)]
+        print("empty data")
+        print(empty_data)
+        if empty_data.empty:
             return full_components
         else:  # get new ticker from Yahoo Finance
-            for indx, (company, _, ticker, _) in empty_tickers.iterrows():
-                print(f"Company {company} had no ticker.")
-                empty_tickers.loc[indx, "ticker"] = self.get_symbol(company)
+            for indx, (
+                company,
+                isin,
+                ticker,
+                sector,
+                industry,
+                shares_num,
+            ) in empty_data.iterrows():
+                print(f"Company {company} had missing data.")
 
-        # save new csv with full WIG
-        full_components[["company", "ISIN", "ticker"]].to_csv(
-            "wig_comps.csv", index=False
-        )
+                if ticker is np.NaN:
+                    # add missing ticker
+                    new_symbol = self.get_symbol(company)
+                    full_components.loc[indx, "ticker"] = new_symbol
+
+                if sector is np.NaN or industry is np.NaN:
+                    # add missing sector and industry values
+                    asset_profile = yq.Ticker(new_symbol).asset_profile[new_symbol]
+                    full_components.loc[indx, "sector"] = asset_profile["sector"]
+                    full_components.loc[indx, "industry"] = asset_profile["industry"]
+
+            # save new csv with full WIG
+            full_components.drop(columns="shares_num").to_csv(
+                "wig_comps.csv", index=False
+            )
+
         return full_components
 
     def run(self):
