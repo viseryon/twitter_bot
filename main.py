@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from pandas import Index
 import plotly.express as px
 import yahooquery as yq
 from matplotlib import pyplot as plt
@@ -158,7 +159,7 @@ class TwitterBot:
 
         return full_components
 
-    def get_start_date(self, period="ytd"):
+    def get_start_date(self, period="day") -> Index:
 
         td = pd.Timestamp(datetime.today())
 
@@ -182,7 +183,7 @@ class TwitterBot:
         elif period == "day":
             return self.ts.tail(2).index
         elif period == "year":
-            return self.ts.iloc[self.ts.index.max() - 252 :]
+            return self.ts.iloc[self.ts.index.max() - 252 :].index
         else:
             raise ValueError(f'period {period} not available')
 
