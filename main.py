@@ -26,7 +26,16 @@ class TwitterBot:
         self.wig_components: pd.DataFrame = wig_components
         self.tickers: list = wig_components.ticker.to_list()
 
-        # self.prices = self._get_data()
+        self.prices = self._get_data()
+
+        ts = pd.DataFrame(self.prices.index)
+        ts["year"] = ts.date.dt.year
+        ts["quarter"] = ts.date.dt.quarter
+        ts["month"] = ts.date.dt.month
+        ts["week"] = ts.date.dt.isocalendar().week
+        ts["day"] = ts.date.dt.day
+        ts["weekday"] = ts.date.dt.weekday
+        self.ts: pd.DataFrame = ts
 
     def _au(
         self, bearer_token, api_key, api_secret, access_token, access_token_secret
@@ -70,7 +79,9 @@ class TwitterBot:
         tickers = yq.Ticker(self.tickers)
         self._yq_tickers = tickers
 
-        prices = tickers.history()[["adjclose"]]
+        start_date = datetime.today() - timedelta(days=365)
+
+        prices = tickers.history(start=start_date, interval="1d")[["adjclose"]]
         prices = prices.reset_index().pivot(
             index="date", columns="symbol", values="adjclose"
         )
@@ -146,6 +157,34 @@ class TwitterBot:
             )
 
         return full_components
+
+    def get_start_date(self, period="ytd"):
+
+        td = pd.Timestamp(datetime.today())
+
+        if period == "ytd":
+            return self.ts.loc[self.ts[self.ts.year == td.year - 1].index.max() :].index
+        elif period == "mtd":
+            return self.ts.iloc[
+                self.ts[
+                    (self.ts.year == td.year) & (self.ts.month == td.month)
+                ].index.min()
+                - 1 :
+            ].index
+        elif period == "qtd":
+            return self.ts.iloc[
+                self.ts[(self.ts.year == td.year) & (self.ts.quarter == td.quarter)].index.min() - 1 :
+            ].index
+        elif period == "week":  # remember to do this on weekends!
+            return self.ts.iloc[
+                self.ts[(self.ts.year == td.year) & (self.ts.week == td.week)].index.min() - 1 :
+            ].index
+        elif period == "day":
+            return self.ts.tail(2).index
+        elif period == "year":
+            return self.ts.iloc[self.ts.index.max() - 252 :]
+        else:
+            raise ValueError(f'period {period} not available')
 
     def run(self):
         raise NotImplementedError
