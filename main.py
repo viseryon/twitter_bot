@@ -4,13 +4,20 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from pandas import Index
 import plotly.express as px
 import yahooquery as yq
 from matplotlib import pyplot as plt
+from pandas import Index
 from tweepy import API, Client, OAuth1UserHandler
 
 import keys
+
+
+"""
+script running my twitter bot
+
+it includes TwitterBot class that will run bot that posts pictures with WIG returns
+"""
 
 plt.style.use("dark_background")
 
@@ -41,6 +48,8 @@ class TwitterBot:
     def _au(
         self, bearer_token, api_key, api_secret, access_token, access_token_secret
     ) -> tuple[Client, API]:
+        """auth with tweepy"""
+
         client = Client(
             bearer_token, api_key, api_secret, access_token, access_token_secret
         )
@@ -51,6 +60,15 @@ class TwitterBot:
         return client, api
 
     def auth(self) -> tuple[Client, API]:
+        """
+        auth method
+
+        reads from keys all the necessary secrets
+
+        Returns:
+            tuple[Client, API]: stuff needed make tweets
+        """
+
         bearer_token = keys.BEARER_TOKEN
         api_key = keys.API_KEY
         access_token = keys.ACCESS_TOKEN
@@ -63,7 +81,15 @@ class TwitterBot:
 
         return client, api
 
-    def _make_tweet(self, text: str, pictures=None):
+    def make_tweet(self, text: str, pictures: list[str]) -> None:
+        """
+        method that makes a tweet
+
+        Args:
+            text (str): text to put in the tweet
+            pictures (list[str]): list of paths to pictures to tweet
+        """
+
         if pictures:
             lst = []
             for picture in pictures:
@@ -72,10 +98,21 @@ class TwitterBot:
 
             self.client.create_tweet(text=text, media_ids=lst)
 
+            for picture in pictures:
+                os.remove(picture)
+
         else:
             self.client.create_tweet(text=text)
 
     def _get_data(self) -> pd.DataFrame:
+        """
+        get data from YahooFinance
+
+        get pd.DataFrame of prices of selected tickers and transform it
+
+        Returns:
+            pd.DataFrame: prices with index of dates and columns of stock prices
+        """
 
         tickers = yq.Ticker(self.tickers)
         self._yq_tickers = tickers
@@ -90,20 +127,34 @@ class TwitterBot:
         return prices
 
     @staticmethod
-    def get_symbol(query, preferred_exchange="WSE"):
+    def get_symbol(query: str, preferred_exchange: str = "WSE") -> None | str:
+        """
+        get ticker
+
+        searches Yahoo Finance for a ticker by other identifier
+
+        Args:
+            query (str): some identifier
+            preferred_exchange (str, optional): what exchange to prioritize. Defaults to "WSE".
+
+        Returns:
+            _type_: _description_
+        """
+
         try:
             data = yq.search(query)
         except ValueError:  # Will catch JSONDecodeError
             print(query)
+            return None
         else:
             quotes = data["quotes"]
             if len(quotes) == 0:
-                return "No Symbol Found"
+                return None
 
             symbol = quotes[0]["symbol"]
             for quote in quotes:
                 if quote["exchange"] == preferred_exchange:
-                    symbol = quote["symbol"]
+                    symbol: str = quote["symbol"]
                     break
             return symbol
 
@@ -160,6 +211,20 @@ class TwitterBot:
         return full_components
 
     def get_start_date(self, period="day") -> Index:
+        """
+        get a start date of some period to calculate returns
+
+        possible periods: ytd, qtd, mtd, week, day, year
+
+        Args:
+            period (str, optional): what period the changes will be calculated. Defaults to "day".
+
+        Raises:
+            NotImplementedError
+
+        Returns:
+            Index: index to use with df.loc
+        """
 
         td = pd.Timestamp(datetime.today())
 
@@ -174,18 +239,24 @@ class TwitterBot:
             ].index
         elif period == "qtd":
             return self.ts.iloc[
-                self.ts[(self.ts.year == td.year) & (self.ts.quarter == td.quarter)].index.min() - 1 :
+                self.ts[
+                    (self.ts.year == td.year) & (self.ts.quarter == td.quarter)
+                ].index.min()
+                - 1 :
             ].index
         elif period == "week":  # remember to do this on weekends!
             return self.ts.iloc[
-                self.ts[(self.ts.year == td.year) & (self.ts.week == td.week)].index.min() - 1 :
+                self.ts[
+                    (self.ts.year == td.year) & (self.ts.week == td.week)
+                ].index.min()
+                - 1 :
             ].index
         elif period == "day":
             return self.ts.tail(2).index
         elif period == "year":
             return self.ts.iloc[self.ts.index.max() - 252 :].index
         else:
-            raise ValueError(f'period {period} not available')
+            raise NotImplementedError(f"period {period} not available")
 
     def run(self):
         raise NotImplementedError
