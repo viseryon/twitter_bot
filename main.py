@@ -6,12 +6,12 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import yahooquery as yq
+import yfinance as yf
 from matplotlib import pyplot as plt
 from pandas import Index
 from tweepy import API, Client, OAuth1UserHandler
 
 import keys
-
 
 """
 script running my twitter bot
@@ -37,12 +37,12 @@ class TwitterBot:
         self.prices = self._get_data()
 
         ts = pd.DataFrame(self.prices.index)
-        ts["year"] = ts.date.dt.year
-        ts["quarter"] = ts.date.dt.quarter
-        ts["month"] = ts.date.dt.month
-        ts["week"] = ts.date.dt.isocalendar().week
-        ts["day"] = ts.date.dt.day
-        ts["weekday"] = ts.date.dt.weekday
+        ts["year"] = ts.Date.dt.year
+        ts["quarter"] = ts.Date.dt.quarter
+        ts["month"] = ts.Date.dt.month
+        ts["week"] = ts.Date.dt.isocalendar().week
+        ts["day"] = ts.Date.dt.day
+        ts["weekday"] = ts.Date.dt.weekday
         self.ts: pd.DataFrame = ts
 
     def _au(
@@ -114,17 +114,13 @@ class TwitterBot:
             pd.DataFrame: prices with index of dates and columns of stock prices
         """
 
-        tickers = yq.Ticker(self.tickers)
-        self._yq_tickers = tickers
+        tickers = yf.Tickers(self.tickers)
 
         start_date = datetime.today() - timedelta(days=365)
 
-        prices = tickers.history(start=start_date, interval="1d")[["adjclose"]]
-        prices = prices.reset_index().pivot(
-            index="date", columns="symbol", values="adjclose"
-        )
-
-        prices.index = pd.to_datetime(prices.index)
+        prices = tickers.history(start=start_date)
+        prices = prices.Close
+        prices.columns = [tick.removesuffix('.WA') for tick in prices.columns]
 
         return prices
 
@@ -260,9 +256,8 @@ class TwitterBot:
 
     ### performance heatmaps
 
-    def post_daily_returns(self):
-        ...
-        
+    def post_daily_returns(self): ...
+
     def run(self):
         raise NotImplementedError
 
