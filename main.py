@@ -120,7 +120,7 @@ class TwitterBot:
 
         prices = tickers.history(start=start_date)
         prices = prices.Close
-        prices.columns = [tick.removesuffix('.WA') for tick in prices.columns]
+        prices.columns = [tick.removesuffix(".WA") for tick in prices.columns]
 
         return prices
 
@@ -257,6 +257,14 @@ class TwitterBot:
     ### performance heatmaps
 
     def post_daily_returns(self): ...
+
+    def post_weekly_returns(self): ...
+
+    def post_monthly_returns(self): ...
+
+    def post_quarterly_returns(self): ...
+
+    def post_yearly_returns(self): ...
 
     def run(self):
         raise NotImplementedError
