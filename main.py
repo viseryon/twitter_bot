@@ -124,6 +124,8 @@ class TwitterBot:
             index="date", columns="symbol", values="adjclose"
         )
 
+        prices.index = pd.to_datetime(prices.index)
+
         return prices
 
     @staticmethod
@@ -177,8 +179,6 @@ class TwitterBot:
 
         # check for empty data
         empty_data = full_components[full_components.isnull().any(axis=1)]
-        print("empty data")
-        print(empty_data)
         if empty_data.empty:
             return full_components
         else:  # get new ticker from Yahoo Finance
@@ -258,6 +258,11 @@ class TwitterBot:
         else:
             raise NotImplementedError(f"period {period} not available")
 
+    ### performance heatmaps
+
+    def post_daily_returns(self):
+        ...
+        
     def run(self):
         raise NotImplementedError
 
