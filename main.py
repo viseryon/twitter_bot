@@ -415,7 +415,7 @@ class TwitterBot:
 
         fig = px.treemap(
             data,
-            path=["sector", "industry", "ticker"],
+            path=["sector", "ticker"],
             values="mkt_cap",
             color="returns",
             color_continuous_scale=["#CC0000", "#292929", "#00CC00"],
@@ -423,14 +423,14 @@ class TwitterBot:
         )
 
         fig.update_traces(
-            insidetextfont=dict(size=120, family=font),
-            textfont=dict(size=40, family=font),
+            insidetextfont=dict(size=140, family=font),
+            textfont=dict(size=60, family=font),
             textposition="middle center",
             texttemplate="<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>",
             marker=dict(
                 cornerradius=25,
                 line_width=3,
-                line_color="#1a1a1a",
+                line_color="#444444",
             ),
         )
 
@@ -446,16 +446,17 @@ class TwitterBot:
             width=7680,
             height=4320,
             title=dict(
-                text=f"{period} ⁕ INDEX WIG  ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}",
-                font=dict(color="white", size=150, family=font),
+                text=f"{period} ⁕ INDEX WIG ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}",
+                font=dict(color="white", size=170, family=font),
                 yanchor="middle",
                 xanchor="center",
                 xref="paper",
                 yref="paper",
                 x=0.5,
+                pad=dict(t=100, b=100)
             ),
             paper_bgcolor="#1a1a1a",
-            colorway=["#D9202E", "#AC1B26", "#7F151D", "#3B6323", "#518A30", "#66B13C"],
+            colorway=["#d11635", "#AC1B26", "#7F151D", "#3B6323", "#518A30", "#66B13C"],
         )
 
         fig.add_annotation(
