@@ -277,7 +277,7 @@ class TwitterBot:
                 .index
             )
         elif period == "day":
-            return self.ts.iloc[[0, -1]].index
+            return self.ts.iloc[[-2, -1]].index
         elif period == "year":
             return self.ts.iloc[self.ts.index.max() - 252 :].iloc[[0, -1]].index
         else:
@@ -290,12 +290,12 @@ class TwitterBot:
 
     ### performance heatmaps
 
-    def post_daily_returns(self):
+    def heatmap_daily_returns(self):
         if not self.is_trading_day():
             return
 
         # calculate daily returns
-        indicies = self.get_periods_indicies()("day")
+        indicies = self.get_periods_indicies("day")
         data: pd.DataFrame = self.prices.iloc[indicies].pct_change().dropna().T
         data.columns = ["returns"]
 
@@ -315,7 +315,11 @@ class TwitterBot:
         data["curr_prices"] = self.curr_prices
 
         data["mkt_cap"] = data["curr_prices"] * data["shares_num"]
-        data = data.reset_index().rename({"index": "ticker"}, axis=1)
+        data = (
+            data.reset_index()
+            .rename({"index": "ticker"}, axis=1)
+            .sort_values("returns", ascending=False)
+        )
 
         # 'ticker', 'company', 'sector', 'industry', 'shares_num', 'returns', 'curr_prices', 'mkt_cap'
 
@@ -369,7 +373,7 @@ class TwitterBot:
         )
 
         fig.add_annotation(
-            text=("source: YahooFinance!, @SliwinskiAlan"),
+            text=("source: YahooFinance!"),
             x=0.90,
             y=-0.023,
             font=dict(family="Calibri", size=80, color="white"),
@@ -396,52 +400,52 @@ class TwitterBot:
         )
 
         # fig.show()
-        fig.write_image("wig_heatmap.png")
-        return
-        data["udzial_zmiana_pct"] = data.Udzial * data.Zmiana_pct
-        sectors_change = (
-            data.groupby("Sector")["udzial_zmiana_pct"].sum()
-            / data.groupby("Sector")["Udzial"].sum()
-        )
+        path = "wig_heatmap_1d.png"
+        fig.write_image(path)
 
-        sectors_change = sectors_change.sort_values(ascending=False)
-        data = data.sort_values("Zmiana_pct", ascending=False)
+        data["contribution"] = data.mkt_cap * data.returns
+        sectors_return = (
+            data.groupby("sector")["contribution"].sum()
+            / data.groupby("sector")["mkt_cap"].sum()
+        ).sort_values(ascending=False)
 
-        data_string = f"\nWIG perf 1D: {stat_chng:.2%}"
+        tweet_text = f"\nWIG Index 1D performance: {wig_return:.2%}"
 
-        if stat_chng > 0.02:
-            data_string += " 🟢🟢🟢\n"
-        elif stat_chng > 0.01:
-            data_string += " 🟢🟢\n"
-        elif stat_chng > 0.005:
-            data_string += " 🟢\n"
-        elif stat_chng > -0.005:
-            data_string += " ➖\n"
-        elif stat_chng > -0.01:
-            data_string += " 🔴\n"
-        elif stat_chng > -0.02:
-            data_string += " 🔴🔴\n"
+        if wig_return > 0.02:
+            tweet_text += " 🟢🟢🟢\n"
+        elif wig_return > 0.01:
+            tweet_text += " 🟢🟢\n"
+        elif wig_return > 0.005:
+            tweet_text += " 🟢\n"
+        elif wig_return > -0.005:
+            tweet_text += " ➖\n"
+        elif wig_return > -0.01:
+            tweet_text += " 🔴\n"
+        elif wig_return > -0.02:
+            tweet_text += " 🔴🔴\n"
         else:
-            data_string += " 🔴🔴🔴\n"
+            tweet_text += " 🔴🔴🔴\n"
 
-        data_string += f"\n🟢 {data.Ticker.iloc[0]} {data.Nazwa.iloc[0]} {data.Zmiana_pct.iloc[0]:.2%}\n🔴 {data.Ticker.iloc[-1]} {data.Nazwa.iloc[-1]} {data.Zmiana_pct.iloc[-1]:.2%}\n\n"
+        tweet_text += f"\n🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}\n🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}\n\n"
 
-        for i, (sector, change) in enumerate(sectors_change.items()):
-            if i < 3:
-                data_string += f"{i+1}. {sector} ->{change:>7.2%}\n"
+        for i, (sector, change) in enumerate(sectors_return.items(), start=1):
+            if i < 4:
+                tweet_text += f"{i}. {sector} ->{change:.2%}\n"
+            else:
+                break
 
-        return True
+        return (path, tweet_text)
 
-    def post_weekly_returns(self):
+    def heatmap_weekly_returns(self):
         raise NotImplementedError
 
-    def post_monthly_returns(self):
+    def heatmap_monthly_returns(self):
         raise NotImplementedError
 
-    def post_quarterly_returns(self):
+    def heatmap_quarterly_returns(self):
         raise NotImplementedError
 
-    def post_yearly_returns(self):
+    def heatmap_yearly_returns(self):
         raise NotImplementedError
 
     def run(self): ...
