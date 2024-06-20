@@ -193,12 +193,48 @@ class TwitterBot:
             saved_components, updated_components, how="right", on=["company", "ISIN"]
         )
 
+        pretty_industry = {
+            "Financial Data & Stock Exchanges": "Financial Data<br>Stock Exchanges",
+            "Utilities—Regulated Gas": "Regulated Gas",
+            "Utilities—Independent Power Producers": "Independent<br>Power Producers",
+            "Utilities—Renewable": "Renewable",
+            "Utilities—Regulated Electric": "Regulated Electric",
+            "Real Estate—Diversified": "Diversified",
+            "Real Estate Services": "Services",
+            "Real Estate—Development": "Development",
+            "Farm & Heavy Construction Machinery": "Farm & Heavy<br>Construction Machinery",
+            "Staffing & Employment Services": "Staffing & Employment<br>Services",
+            "Tools & Accessories": "Tools<br>& Accessories",
+            "Building Products & Equipment": "Building Products<br>& Equipment",
+            "Integrated Freight & Logistics": "Integrated Freight<br>& Logistics",
+            "Specialty Industrial Machinery": "Specialty<br>Industrial Machinery",
+            "Electrical Equipment & Parts": "Electrical Equipment<br>& Parts",
+            "Metal Fabrication": "Metal<br>Fabrication",
+            "Aerospace & Defense": "Aerospace<br>& Defense",
+            "Paper & Paper Products": "Paper<br>& Paper Products",
+            "Specialty Chemicals": "Specialty<br>Chemicals",
+            "Specialty Business Services": "Specialty<br>Business Services",
+            "Drug Manufacturers—Specialty & Generic": "Drug Manufacturers<br>Specialty & Generic",
+            "Medical Care Facilities": "Medical Care<br>Facilities",
+            "Medical Instruments & Supplies": "Medical Instruments<br>& Supplies",
+            "Pharmaceutical Retailers": "Pharmaceutical<br>Retailers",
+            "Electronic Components": "Electronic<br>Components",
+            "Scientific & Technical Instruments": "Scientific & Technical<br>Instruments",
+            "Electronics & Computer Distribution": "Electronics<br>& Computer Distribution",
+            "Furnishings, Fixtures & Appliances": "Furnishings, Fixtures<br>& Appliances",
+            "Travel Services": "Travel<br<Services",
+            "Information Technology Services": "Information Technology<br>Services",
+            "Software—Infrastructure": "Software<br>Infrastructure",
+            "Medical Devices": "Medical<br>Devices",
+        }
+
         # check for empty data
         empty_data = full_components[full_components.isnull().any(axis=1)]
         if empty_data.empty:
             full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(
                 ".WA"
             )
+            full_components.industry = full_components.industry.map(pretty_industry)
             return full_components
         else:  # get new ticker from Yahoo Finance
             for indx, (
@@ -227,6 +263,7 @@ class TwitterBot:
                 "wig_comps.csv", index=False
             )
 
+        full_components.industry = full_components.industry.map(pretty_industry)
         full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(".WA")
         return full_components
 
