@@ -218,9 +218,9 @@ class TwitterBot:
         full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(".WA")
         return full_components
 
-    def get_start_date(self, period="day") -> Index:
+    def get_periods_indicies(self, period="day") -> Index:
         """
-        get a start date of some period to calculate returns
+        get a start date and last date of some period to calculate returns
 
         possible periods: ytd, qtd, mtd, week, day, year
 
@@ -231,36 +231,55 @@ class TwitterBot:
             NotImplementedError
 
         Returns:
-            Index: index to use with df.loc
+            Index: index to use with df.iloc
         """
 
         if period == "ytd":
-            return self.ts.loc[self.ts[self.ts.year == self.today.year - 1].index.max() :].index
+            return (
+                self.ts.loc[self.ts[self.ts.year == self.today.year - 1].index.max() :]
+                .iloc[[0, -1]]
+                .index
+            )
         elif period == "mtd":
-            return self.ts.iloc[
-                self.ts[
-                    (self.ts.year == self.today.year) & (self.ts.month == self.today.month)
-                ].index.min()
-                - 1 :
-            ].index
+            return (
+                self.ts.iloc[
+                    self.ts[
+                        (self.ts.year == self.today.year)
+                        & (self.ts.month == self.today.month)
+                    ].index.min()
+                    - 1 :
+                ]
+                .iloc[[0, -1]]
+                .index
+            )
         elif period == "qtd":
-            return self.ts.iloc[
-                self.ts[
-                    (self.ts.year == self.today.year) & (self.ts.quarter == self.today.quarter)
-                ].index.min()
-                - 1 :
-            ].index
+            return (
+                self.ts.iloc[
+                    self.ts[
+                        (self.ts.year == self.today.year)
+                        & (self.ts.quarter == self.today.quarter)
+                    ].index.min()
+                    - 1 :
+                ]
+                .iloc[[0, -1]]
+                .index
+            )
         elif period == "week":  # remember to do this on weekends!
-            return self.ts.iloc[
-                self.ts[
-                    (self.ts.year == self.today.year) & (self.ts.week == self.today.week)
-                ].index.min()
-                - 1 :
-            ].index
+            return (
+                self.ts.iloc[
+                    self.ts[
+                        (self.ts.year == self.today.year)
+                        & (self.ts.week == self.today.week)
+                    ].index.min()
+                    - 1 :
+                ]
+                .iloc[[0, -1]]
+                .index
+            )
         elif period == "day":
-            return self.ts.tail(2).index
+            return self.ts.iloc[[0, -1]].index
         elif period == "year":
-            return self.ts.iloc[self.ts.index.max() - 252 :].index
+            return self.ts.iloc[self.ts.index.max() - 252 :].iloc[[0, -1]].index
         else:
             raise NotImplementedError(f"period {period} not available")
 
@@ -276,7 +295,7 @@ class TwitterBot:
             return
 
         # calculate daily returns
-        indicies = self.get_start_date("day")
+        indicies = self.get_periods_indicies()("day")
         data: pd.DataFrame = self.prices.iloc[indicies].pct_change().dropna().T
         data.columns = ["returns"]
 
