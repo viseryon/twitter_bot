@@ -176,6 +176,9 @@ class TwitterBot:
         # check for empty data
         empty_data = full_components[full_components.isnull().any(axis=1)]
         if empty_data.empty:
+            full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(
+                ".WA"
+            )
             return full_components
         else:  # get new ticker from Yahoo Finance
             for indx, (
@@ -191,7 +194,7 @@ class TwitterBot:
                 if ticker is np.NaN:
                     # add missing ticker
                     new_symbol = self.get_symbol(company)
-                    full_components.loc[indx, "ticker"] = new_symbol
+                    full_components.loc[indx, "yf_ticker"] = new_symbol
 
                 if sector is np.NaN or industry is np.NaN:
                     # add missing sector and industry values
@@ -204,6 +207,9 @@ class TwitterBot:
                 "wig_comps.csv", index=False
             )
 
+        full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(
+            ".WA"
+        )
         return full_components
 
     def get_start_date(self, period="day") -> Index:
@@ -254,20 +260,37 @@ class TwitterBot:
         else:
             raise NotImplementedError(f"period {period} not available")
 
+    def is_trading_day(self) -> bool:
+        if pd.Timestamp(datetime.today().date()) in self.ts.Date.to_list():
+            return True
+        return False
+
     ### performance heatmaps
 
-    def post_daily_returns(self): ...
+    def post_daily_returns(self):
+        if not self.is_trading_day():
+            return
 
-    def post_weekly_returns(self): ...
+        # calculate daily returns
+        indicies = self.get_start_date("day")
+        data: pd.DataFrame = self.prices.loc[indicies].pct_change(periods=1).dropna().T
+        data.columns = ["returns"]
 
-    def post_monthly_returns(self): ...
+        data = pd.merge()
 
-    def post_quarterly_returns(self): ...
-
-    def post_yearly_returns(self): ...
-
-    def run(self):
+    def post_weekly_returns(self):
         raise NotImplementedError
+
+    def post_monthly_returns(self):
+        raise NotImplementedError
+
+    def post_quarterly_returns(self):
+        raise NotImplementedError
+
+    def post_yearly_returns(self):
+        raise NotImplementedError
+
+    def run(self): ...
 
 
 if __name__ == "__main__":

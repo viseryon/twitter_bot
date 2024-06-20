@@ -1,4 +1,4 @@
-company,ISIN,ticker,sector,industry
+company,ISIN,yf_ticker,sector,industry
 PKOBP,PLPKO0000016,PKO.WA,Financial Services,Banks - Regional
 PKNORLEN,PLPKN0000018,PKN.WA,Energy,Oil & Gas Integrated
 PZU,PLPZU0000011,PZU.WA,Financial Services,Insurance - Property & Casualty
