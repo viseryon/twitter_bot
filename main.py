@@ -133,7 +133,7 @@ class TwitterBot:
         return prices, wig
 
     @staticmethod
-    def get_symbol(query: str, preferred_exchange: str = "WSE") -> None | str:
+    def get_symbol(query: str, preferred_exchange: str = "WSE", max_tries=5, **kwargs) -> str:
         """
         get ticker
 
@@ -151,11 +151,19 @@ class TwitterBot:
             data = yq.search(query)
         except ValueError:  # Will catch JSONDecodeError
             print(query)
-            return None
+            tries = kwargs.get('tries', 0)
+            if tries >= max_tries:
+                raise ValueError(f'YahooFinance have not returned the necessary ticker\n{query = }')
+            return TwitterBot.get_symbol(query, tries=tries+1)
         else:
             quotes = data["quotes"]
             if len(quotes) == 0:
-                return None
+                tries = kwargs.get("tries", 0)
+                if tries >= 5:
+                    raise ValueError(
+                        f"YahooFinance have not returned the necessary ticker\n{query = }"
+                    )
+                return TwitterBot.get_symbol(query, tries=tries + 1)
 
             symbol = quotes[0]["symbol"]
             for quote in quotes:
