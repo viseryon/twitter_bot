@@ -1,10 +1,11 @@
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import pytz
 import yahooquery as yq
 import yfinance as yf
 from matplotlib import pyplot as plt
@@ -32,9 +33,10 @@ class TwitterBot:
 
         wig_components = self._get_wig_components()
         self.wig_components: pd.DataFrame = wig_components
-        self.tickers: list = wig_components.ticker.to_list()
+        self.tickers: list = wig_components.yf_ticker.to_list()
 
-        self.prices = self._get_data()
+        self.prices, self.wig = self._get_data()
+        self.curr_prices = self.prices.iloc[-1]
 
         ts = pd.DataFrame(self.prices.index)
         ts["year"] = ts.Date.dt.year
@@ -44,6 +46,9 @@ class TwitterBot:
         ts["day"] = ts.Date.dt.day
         ts["weekday"] = ts.Date.dt.weekday
         self.ts: pd.DataFrame = ts
+
+        self.tzinfo = pytz.timezone("Europe/Warsaw")
+        self.today = pd.Timestamp(datetime.today())
 
     def _au(
         self, bearer_token, api_key, api_secret, access_token, access_token_secret
@@ -104,7 +109,7 @@ class TwitterBot:
         else:
             self.client.create_tweet(text=text)
 
-    def _get_data(self) -> pd.DataFrame:
+    def _get_data(self) -> tuple[pd.DataFrame, pd.Series]:
         """
         get data from YahooFinance
 
@@ -114,15 +119,18 @@ class TwitterBot:
             pd.DataFrame: prices with index of dates and columns of stock prices
         """
 
-        tickers = yf.Tickers(self.tickers)
+        tickers = yf.Tickers(self.tickers + ["WIG.WA"])
 
         start_date = datetime.today() - timedelta(days=365)
 
-        prices = tickers.history(start=start_date)
+        prices = tickers.history(start=start_date, timeout=20)
         prices = prices.Close
         prices.columns = [tick.removesuffix(".WA") for tick in prices.columns]
 
-        return prices
+        wig = prices.WIG
+        prices = prices.drop(columns=["WIG"])
+
+        return prices, wig
 
     @staticmethod
     def get_symbol(query: str, preferred_exchange: str = "WSE") -> None | str:
@@ -207,9 +215,7 @@ class TwitterBot:
                 "wig_comps.csv", index=False
             )
 
-        full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(
-            ".WA"
-        )
+        full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(".WA")
         return full_components
 
     def get_start_date(self, period="day") -> Index:
@@ -228,28 +234,26 @@ class TwitterBot:
             Index: index to use with df.loc
         """
 
-        td = pd.Timestamp(datetime.today())
-
         if period == "ytd":
-            return self.ts.loc[self.ts[self.ts.year == td.year - 1].index.max() :].index
+            return self.ts.loc[self.ts[self.ts.year == self.today.year - 1].index.max() :].index
         elif period == "mtd":
             return self.ts.iloc[
                 self.ts[
-                    (self.ts.year == td.year) & (self.ts.month == td.month)
+                    (self.ts.year == self.today.year) & (self.ts.month == self.today.month)
                 ].index.min()
                 - 1 :
             ].index
         elif period == "qtd":
             return self.ts.iloc[
                 self.ts[
-                    (self.ts.year == td.year) & (self.ts.quarter == td.quarter)
+                    (self.ts.year == self.today.year) & (self.ts.quarter == self.today.quarter)
                 ].index.min()
                 - 1 :
             ].index
         elif period == "week":  # remember to do this on weekends!
             return self.ts.iloc[
                 self.ts[
-                    (self.ts.year == td.year) & (self.ts.week == td.week)
+                    (self.ts.year == self.today.year) & (self.ts.week == self.today.week)
                 ].index.min()
                 - 1 :
             ].index
@@ -273,10 +277,141 @@ class TwitterBot:
 
         # calculate daily returns
         indicies = self.get_start_date("day")
-        data: pd.DataFrame = self.prices.loc[indicies].pct_change(periods=1).dropna().T
+        data: pd.DataFrame = self.prices.iloc[indicies].pct_change().dropna().T
         data.columns = ["returns"]
 
-        data = pd.merge()
+        wig_return: float = self.wig.iloc[indicies].pct_change().values[0]
+
+        data = pd.merge(
+            self.wig_components.set_index("ticker"),
+            data,
+            right_index=True,
+            left_index=True,
+            validate="one_to_one",
+        )
+        # data.columns
+        # ['company', 'ISIN', 'yf_ticker', 'sector', 'industry', 'shares_num', 'returns']
+
+        data = data.drop(columns=["ISIN", "yf_ticker"])
+        data["curr_prices"] = self.curr_prices
+
+        data["mkt_cap"] = data["curr_prices"] * data["shares_num"]
+        data = data.reset_index().rename({"index": "ticker"}, axis=1)
+
+        # 'ticker', 'company', 'sector', 'industry', 'shares_num', 'returns', 'curr_prices', 'mkt_cap'
+
+        fig = px.treemap(
+            data,
+            path=[px.Constant("WIG"), "sector", "industry", "ticker"],
+            values="mkt_cap",
+            color="returns",
+            color_continuous_scale=["#CC0000", "#353535", "#00CC00"],
+            custom_data=data[["returns", "company", "ticker", "curr_prices", "sector"]],
+        )
+
+        fig.update_traces(
+            insidetextfont=dict(
+                size=120,
+            ),
+            textfont=dict(size=40),
+            textposition="middle center",
+            texttemplate="<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>",
+            marker_line_width=3,
+            marker_line_color="#1a1a1a",
+            root=dict(color="#1a1a1a"),
+        )
+
+        fig.update_coloraxes(
+            showscale=True,
+            cmin=-0.03,
+            cmax=0.03,
+            cmid=0,
+        )
+
+        fig.update_layout(
+            margin=dict(t=200, l=5, r=5, b=120),
+            width=7680,
+            height=4320,
+            title=dict(
+                text=f"INDEX WIG  ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}",
+                font=dict(
+                    color="white",
+                    size=150,
+                ),
+                yanchor="middle",
+                xanchor="center",
+                xref="paper",
+                yref="paper",
+                x=0.5,
+            ),
+            paper_bgcolor="#1a1a1a",
+            # paper_bgcolor="rgba(0,0,0,0)",
+            colorway=["#D9202E", "#AC1B26", "#7F151D", "#3B6323", "#518A30", "#66B13C"],
+        )
+
+        fig.add_annotation(
+            text=("source: YahooFinance!, @SliwinskiAlan"),
+            x=0.90,
+            y=-0.023,
+            font=dict(family="Calibri", size=80, color="white"),
+            opacity=0.7,
+            align="left",
+        )
+
+        fig.add_annotation(
+            text=(datetime.now(self.tzinfo).strftime(r"%Y/%m/%d %H:%M")),
+            x=0.1,
+            y=-0.025,
+            font=dict(family="Calibri", size=80, color="white"),
+            opacity=0.7,
+            align="left",
+        )
+
+        fig.add_annotation(
+            text=("@SliwinskiAlan"),
+            x=0.5,
+            y=-0.025,
+            font=dict(family="Calibri", size=80, color="white"),
+            opacity=0.7,
+            align="left",
+        )
+
+        # fig.show()
+        fig.write_image("wig_heatmap.png")
+        return
+        data["udzial_zmiana_pct"] = data.Udzial * data.Zmiana_pct
+        sectors_change = (
+            data.groupby("Sector")["udzial_zmiana_pct"].sum()
+            / data.groupby("Sector")["Udzial"].sum()
+        )
+
+        sectors_change = sectors_change.sort_values(ascending=False)
+        data = data.sort_values("Zmiana_pct", ascending=False)
+
+        data_string = f"\nWIG perf 1D: {stat_chng:.2%}"
+
+        if stat_chng > 0.02:
+            data_string += " 🟢🟢🟢\n"
+        elif stat_chng > 0.01:
+            data_string += " 🟢🟢\n"
+        elif stat_chng > 0.005:
+            data_string += " 🟢\n"
+        elif stat_chng > -0.005:
+            data_string += " ➖\n"
+        elif stat_chng > -0.01:
+            data_string += " 🔴\n"
+        elif stat_chng > -0.02:
+            data_string += " 🔴🔴\n"
+        else:
+            data_string += " 🔴🔴🔴\n"
+
+        data_string += f"\n🟢 {data.Ticker.iloc[0]} {data.Nazwa.iloc[0]} {data.Zmiana_pct.iloc[0]:.2%}\n🔴 {data.Ticker.iloc[-1]} {data.Nazwa.iloc[-1]} {data.Zmiana_pct.iloc[-1]:.2%}\n\n"
+
+        for i, (sector, change) in enumerate(sectors_change.items()):
+            if i < 3:
+                data_string += f"{i+1}. {sector} ->{change:>7.2%}\n"
+
+        return True
 
     def post_weekly_returns(self):
         raise NotImplementedError
