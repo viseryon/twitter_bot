@@ -194,47 +194,107 @@ class TwitterBot:
         )
 
         pretty_industry = {
-            "Financial Data & Stock Exchanges": "Financial Data<br>Stock Exchanges",
-            "Utilities—Regulated Gas": "Regulated Gas",
-            "Utilities—Independent Power Producers": "Independent<br>Power Producers",
-            "Utilities—Renewable": "Renewable",
-            "Utilities—Regulated Electric": "Regulated Electric",
-            "Real Estate—Diversified": "Diversified",
+            "Financial Data & Stock Exchanges": "Financial Data<br>& Stock Exchanges",
+            "Utilities - Regulated Gas": "Regulated Gas",
+            "Utilities - Independent Power Producers": "Independent<br>Power Producers",
+            "Utilities - Renewable": "Renewable",
+            "Utilities - Regulated Electric": "Regulated Electric",
+            "Real Estate - Diversified": "Diversified",
             "Real Estate Services": "Services",
-            "Real Estate—Development": "Development",
+            "Real Estate - Development": "Development",
             "Farm & Heavy Construction Machinery": "Farm & Heavy<br>Construction Machinery",
             "Staffing & Employment Services": "Staffing & Employment<br>Services",
-            "Tools & Accessories": "Tools<br>& Accessories",
-            "Building Products & Equipment": "Building Products<br>& Equipment",
-            "Integrated Freight & Logistics": "Integrated Freight<br>& Logistics",
-            "Specialty Industrial Machinery": "Specialty<br>Industrial Machinery",
-            "Electrical Equipment & Parts": "Electrical Equipment<br>& Parts",
-            "Metal Fabrication": "Metal<br>Fabrication",
-            "Aerospace & Defense": "Aerospace<br>& Defense",
-            "Paper & Paper Products": "Paper<br>& Paper Products",
-            "Specialty Chemicals": "Specialty<br>Chemicals",
-            "Specialty Business Services": "Specialty<br>Business Services",
-            "Drug Manufacturers—Specialty & Generic": "Drug Manufacturers<br>Specialty & Generic",
+            "Tools & Accessories": "Tools & Accessories",
+            "Building Products & Equipment": "Building Products & Equipment",
+            "Integrated Freight & Logistics": "Integrated Freight & Logistics",
+            "Specialty Industrial Machinery": "Specialty Industrial<br>Machinery",
+            "Electrical Equipment & Parts": "Electrical Equipment & Parts",
+            "Metal Fabrication": "Metal Fabrication",
+            "Aerospace & Defense": "Aerospace & Defense",
+            "Paper & Paper Products": "Paper & Paper Products",
+            "Specialty Chemicals": "Specialty Chemicals",
+            "Specialty Business Services": "Specialty Business<br>Services",
+            "Drug Manufacturers - Specialty & Generic": "Drug Manufacturers<br>Specialty & Generic",
             "Medical Care Facilities": "Medical Care<br>Facilities",
             "Medical Instruments & Supplies": "Medical Instruments<br>& Supplies",
             "Pharmaceutical Retailers": "Pharmaceutical<br>Retailers",
-            "Electronic Components": "Electronic<br>Components",
+            "Electronic Components": "Electronic Components",
             "Scientific & Technical Instruments": "Scientific & Technical<br>Instruments",
-            "Electronics & Computer Distribution": "Electronics<br>& Computer Distribution",
-            "Furnishings, Fixtures & Appliances": "Furnishings, Fixtures<br>& Appliances",
-            "Travel Services": "Travel<br<Services",
+            "Electronics & Computer Distribution": "Electronics & Computer<br>Distribution",
+            "Furnishings, Fixtures & Appliances": "Furnishings,<br>Fixtures & Appliances",
+            "Travel Services": "Travel Services",
             "Information Technology Services": "Information Technology<br>Services",
-            "Software—Infrastructure": "Software<br>Infrastructure",
-            "Medical Devices": "Medical<br>Devices",
+            "Software - Infrastructure": "Infrastructure",
+            "Medical Devices": "Medical Devices",
+            "Banks - Regional": "Banks - Regional",
+            "Oil & Gas Integrated": "Integrated",
+            "Insurance - Property & Casualty": "Property & Casualty",
+            "Internet Retail": "Internet Retail",
+            "Apparel Manufacturing": "Apparel Manufacturing",
+            "Copper": "Copper",
+            "Grocery Stores": "Grocery Stores",
+            "Electronic Gaming & Multimedia": "Electronic<br>Gaming & Multimedia",
+            "Engineering & Construction": "Engineering & Construction",
+            "Aluminum": "Aluminum",
+            "Credit Services": "Credit Services",
+            "Banks - Diversified": "Banks - Diversified",
+            "Apparel Retail": "Apparel Retail",
+            "Leisure": "Leisure",
+            "Telecom Services": "Telecom Services",
+            "Auto Parts": "Auto Parts",
+            "Capital Markets": "Capital Markets",
+            "Software - Application": "Application",
+            "Discount Stores": "Discount Stores",
+            "Entertainment": "Entertainment",
+            "Coking Coal": "Coking Coal",
+            "Medical Distribution": "Medical Distribution",
+            "Restaurants": "Restaurants",
+            "Agricultural Inputs": "Agricultural Inputs",
+            "Diagnostics & Research": "Diagnostics & Research",
+            "Waste Management": "Waste Management",
+            "Biotechnology": "Biotechnology",
+            "Oil & Gas Refining & Marketing": "Refining & Marketing",
+            "Railroads": "Railroads",
+            "Airlines": "Airlines",
+            "Residential Construction": "Residential<br>Construction",
+            "Publishing": "Publishing",
+            "Steel": "Steel",
+            "Thermal Coal": "Thermal Coal",
+            "Confectioners": "Confectioners",
+            "Packaged Foods": "Packaged Foods",
+            "Specialty Retail": "Specialty Retail",
+            "Chemicals": "Chemicals",
+            "Beverages - Wineries & Distilleries": "Wineries & Distilleries",
+            "Asset Management": "Asset Management",
+            "Infrastructure Operations": "Infrastructure<br>Operations",
+            "Conglomerates": "Conglomerates",
+            "Farm Products": "Farm Products",
+            "Security & Protection Services": "Security & Protection<br>Services",
+            "Solar": "Solar",
+            "Computer Hardware": "Computer Hardware",
+            "Broadcasting": "Broadcasting",
+            "Rental & Leasing Services": "Rental & Leasing<br>Services",
+            "Industrial Distribution": "Industrial<br>Distribution",
+            "Advertising Agencies": "Advertising<br>Agencies",
+            "Household & Personal Products": "Household & Personal<br>Products",
+            "Building Materials": "Building Materials",
+            "Food Distribution": "Food Distribution",
+            "Trucking": "Trucking",
+            "Beverages - Non-Alcoholic": "Non-Alcoholic",
+            "Footwear & Accessories": "Footwear & Accessories",
+            "Consulting Services": "Consulting Services",
+            "Communication Equipment": "Communication<br>Equipment",
+            "Internet Content & Information": "Internet<br>Content & Information",
+            "Lumber & Wood Production": "Lumber & Wood<br>Production",
+            "Insurance - Diversified": "Diversified",
         }
-
         # check for empty data
         empty_data = full_components[full_components.isnull().any(axis=1)]
         if empty_data.empty:
             full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(
                 ".WA"
             )
-            full_components.industry = full_components.industry.map(pretty_industry)
+            full_components.industry = full_components.industry.replace(pretty_industry)
             return full_components
         else:  # get new ticker from Yahoo Finance
             for indx, (
@@ -263,7 +323,7 @@ class TwitterBot:
                 "wig_comps.csv", index=False
             )
 
-        full_components.industry = full_components.industry.map(pretty_industry)
+        full_components.industry = full_components.industry.replace(pretty_industry)
         full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(".WA")
         return full_components
 
@@ -355,10 +415,10 @@ class TwitterBot:
 
         fig = px.treemap(
             data,
-            path=[px.Constant("WIG"), "sector", "industry", "ticker"],
+            path=["sector", "industry", "ticker"],
             values="mkt_cap",
             color="returns",
-            color_continuous_scale=["#CC0000", "#353535", "#00CC00"],
+            color_continuous_scale=["#CC0000", "#292929", "#00CC00"],
             custom_data=data[["returns", "company", "ticker", "curr_prices", "sector"]],
         )
 
@@ -367,9 +427,11 @@ class TwitterBot:
             textfont=dict(size=40, family=font),
             textposition="middle center",
             texttemplate="<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>",
-            marker_line_width=3,
-            marker_line_color="#1a1a1a",
-            root=dict(color="#1a1a1a"),
+            marker=dict(
+                cornerradius=25,
+                line_width=3,
+                line_color="#1a1a1a",
+            ),
         )
 
         fig.update_coloraxes(
@@ -393,7 +455,6 @@ class TwitterBot:
                 x=0.5,
             ),
             paper_bgcolor="#1a1a1a",
-            # paper_bgcolor="rgba(0,0,0,0)",
             colorway=["#D9202E", "#AC1B26", "#7F151D", "#3B6323", "#518A30", "#66B13C"],
         )
 
