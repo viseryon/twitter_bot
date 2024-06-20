@@ -133,7 +133,9 @@ class TwitterBot:
         return prices, wig
 
     @staticmethod
-    def get_symbol(query: str, preferred_exchange: str = "WSE", max_tries=5, **kwargs) -> str:
+    def get_symbol(
+        query: str, preferred_exchange: str = "WSE", max_tries=5, **kwargs
+    ) -> str:
         """
         get ticker
 
@@ -151,10 +153,12 @@ class TwitterBot:
             data = yq.search(query)
         except ValueError:  # Will catch JSONDecodeError
             print(query)
-            tries = kwargs.get('tries', 0)
+            tries = kwargs.get("tries", 0)
             if tries >= max_tries:
-                raise ValueError(f'YahooFinance have not returned the necessary ticker\n{query = }')
-            return TwitterBot.get_symbol(query, tries=tries+1)
+                raise ValueError(
+                    f"YahooFinance have not returned the necessary ticker\n{query = }"
+                )
+            return TwitterBot.get_symbol(query, tries=tries + 1)
         else:
             quotes = data["quotes"]
             if len(quotes) == 0:
@@ -298,38 +302,17 @@ class TwitterBot:
 
     ### performance heatmaps
 
-    def heatmap_daily_returns(self):
-        if not self.is_trading_day():
-            return
+    def make_heatmap(self, data: pd.DataFrame, path: str, period: str) -> None:
+        """
+        saves wig heatmap
 
-        # calculate daily returns
-        indicies = self.get_periods_indicies("day")
-        data: pd.DataFrame = self.prices.iloc[indicies].pct_change().dropna().T
-        data.columns = ["returns"]
+        creates actual wig heatmap and saves it
 
-        wig_return: float = self.wig.iloc[indicies].pct_change().values[0]
-
-        data = pd.merge(
-            self.wig_components.set_index("ticker"),
-            data,
-            right_index=True,
-            left_index=True,
-            validate="one_to_one",
-        )
-        # data.columns
-        # ['company', 'ISIN', 'yf_ticker', 'sector', 'industry', 'shares_num', 'returns']
-
-        data = data.drop(columns=["ISIN", "yf_ticker"])
-        data["curr_prices"] = self.curr_prices
-
-        data["mkt_cap"] = data["curr_prices"] * data["shares_num"]
-        data = (
-            data.reset_index()
-            .rename({"index": "ticker"}, axis=1)
-            .sort_values("returns", ascending=False)
-        )
-
-        # 'ticker', 'company', 'sector', 'industry', 'shares_num', 'returns', 'curr_prices', 'mkt_cap'
+        Args:
+            data (pd.DataFrame): cols('ticker', 'company', 'sector', 'industry', 'shares_num', 'returns', 'curr_prices', 'mkt_cap')
+            path (str): filename with extension
+            period (str): used only for title
+        """
 
         fig = px.treemap(
             data,
@@ -364,7 +347,7 @@ class TwitterBot:
             width=7680,
             height=4320,
             title=dict(
-                text=f"INDEX WIG  ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}",
+                text=f"{period} ⁕ INDEX WIG  ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}",
                 font=dict(
                     color="white",
                     size=150,
@@ -407,10 +390,52 @@ class TwitterBot:
             align="left",
         )
 
-        # fig.show()
-        path = "wig_heatmap_1d.png"
         fig.write_image(path)
 
+    def heatmap_daily_returns(self) -> tuple[str, str]:
+        """
+        method for creating wig heatmap for 1d performance
+
+        calculates necessary data and prepares heatmap and text for the tweet
+
+        Returns:
+            tuple[str, str]: path to picture and tweet text
+        """
+
+        # calculate daily returns
+        indicies = self.get_periods_indicies("day")
+        data: pd.DataFrame = self.prices.iloc[indicies].pct_change().dropna().T
+        data.columns = ["returns"]
+
+        wig_return: float = self.wig.iloc[indicies].pct_change().values[0]
+
+        data = pd.merge(
+            self.wig_components.set_index("ticker"),
+            data,
+            right_index=True,
+            left_index=True,
+            validate="one_to_one",
+        )
+        # data.columns
+        # ['company', 'ISIN', 'yf_ticker', 'sector', 'industry', 'shares_num', 'returns']
+
+        data = data.drop(columns=["ISIN", "yf_ticker"])
+        data["curr_prices"] = self.curr_prices
+
+        data["mkt_cap"] = data["curr_prices"] * data["shares_num"]
+        data = (
+            data.reset_index()
+            .rename({"index": "ticker"}, axis=1)
+            .sort_values("returns", ascending=False)
+        )
+
+        # data.columns
+        # 'ticker', 'company', 'sector', 'industry', 'shares_num', 'returns', 'curr_prices', 'mkt_cap'
+
+        path = "wig_heatmap_1d.png"
+        self.make_heatmap(data, path, "1D")
+
+        # building text for the tweet
         data["contribution"] = data.mkt_cap * data.returns
         sectors_return = (
             data.groupby("sector")["contribution"].sum()
