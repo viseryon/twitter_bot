@@ -314,6 +314,8 @@ class TwitterBot:
             period (str): used only for title
         """
 
+        font = "Segoe UI"
+
         fig = px.treemap(
             data,
             path=[px.Constant("WIG"), "sector", "industry", "ticker"],
@@ -324,10 +326,8 @@ class TwitterBot:
         )
 
         fig.update_traces(
-            insidetextfont=dict(
-                size=120,
-            ),
-            textfont=dict(size=40),
+            insidetextfont=dict(size=120, family=font),
+            textfont=dict(size=40, family=font),
             textposition="middle center",
             texttemplate="<br>%{customdata[2]}<br>    <b>%{customdata[0]:.2%}</b>     <br><sup><i>%{customdata[3]:.2f} zł</i><br></sup>",
             marker_line_width=3,
@@ -348,10 +348,7 @@ class TwitterBot:
             height=4320,
             title=dict(
                 text=f"{period} ⁕ INDEX WIG  ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}",
-                font=dict(
-                    color="white",
-                    size=150,
-                ),
+                font=dict(color="white", size=150, family=font),
                 yanchor="middle",
                 xanchor="center",
                 xref="paper",
@@ -367,7 +364,7 @@ class TwitterBot:
             text=("source: YahooFinance!"),
             x=0.90,
             y=-0.023,
-            font=dict(family="Calibri", size=80, color="white"),
+            font=dict(family=font, size=80, color="white"),
             opacity=0.7,
             align="left",
         )
@@ -376,7 +373,7 @@ class TwitterBot:
             text=(datetime.now(self.tzinfo).strftime(r"%Y/%m/%d %H:%M")),
             x=0.1,
             y=-0.025,
-            font=dict(family="Calibri", size=80, color="white"),
+            font=dict(family=font, size=80, color="white"),
             opacity=0.7,
             align="left",
         )
@@ -385,7 +382,7 @@ class TwitterBot:
             text=("@SliwinskiAlan"),
             x=0.5,
             y=-0.025,
-            font=dict(family="Calibri", size=80, color="white"),
+            font=dict(family=font, size=80, color="white"),
             opacity=0.7,
             align="left",
         )
@@ -463,7 +460,7 @@ class TwitterBot:
 
         for i, (sector, change) in enumerate(sectors_return.items(), start=1):
             if i < 4:
-                tweet_text += f"{i}. {sector} ->{change:.2%}\n"
+                tweet_text += f"{i}. {sector} -> {change:.2%}\n"
             else:
                 break
 
