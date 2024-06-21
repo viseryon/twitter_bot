@@ -420,7 +420,6 @@ class TwitterBot:
             color="returns",
             color_continuous_scale=["#CC0000", "#292929", "#00CC00"],
             custom_data=data[["returns", "company", "ticker", "curr_prices", "sector"]],
-            range_color=(-1.0, 1.0),
         )
 
         fig.update_traces(
@@ -443,11 +442,11 @@ class TwitterBot:
         )
 
         fig.update_layout(
-            margin=dict(t=200, l=5, r=5, b=120),
+            margin=dict(t=350, l=5, r=5, b=120),
             width=7680,
             height=4320,
             title=dict(
-                text=f"{period} ⁕ INDEX WIG ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}",
+                text=f"INDEX WIG<br><sup>{period} performance ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}</sup>",
                 font=dict(color="white", size=170, family=font),
                 yanchor="middle",
                 xanchor="center",
