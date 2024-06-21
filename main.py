@@ -39,9 +39,9 @@ logging.basicConfig(
 
 class TwitterBot:
     def __init__(self) -> None:
-        # client, api = self.auth()
-        # self.client: Client = client
-        # self.api: API = api
+        client, api = self.auth()
+        self.client: Client = client
+        self.api: API = api
         logging.info("auth complete")
 
         wig_components = self._get_wig_components()
