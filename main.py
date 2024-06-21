@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -24,19 +25,33 @@ plt.style.use("dark_background")
 
 os.chdir(Path(__file__).parent)
 
+logging.basicConfig(
+    level=logging.INFO,
+    # filename="app.log",
+    format="%(asctime)s - %(levelname)s - %(funcName)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+    handlers=[
+        logging.FileHandler("app.log"),
+        logging.StreamHandler(),
+    ],
+)
+
 
 class TwitterBot:
     def __init__(self) -> None:
         # client, api = self.auth()
         # self.client: Client = client
         # self.api: API = api
+        logging.info("auth complete")
 
         wig_components = self._get_wig_components()
         self.wig_components: pd.DataFrame = wig_components
         self.tickers: list = wig_components.yf_ticker.to_list()
+        logging.info("downloaded wig components")
 
         self.prices, self.wig = self._get_data()
         self.curr_prices = self.prices.iloc[-1]
+        logging.info("downloaded data")
 
         ts = pd.DataFrame(self.prices.index)
         ts["year"] = ts.Date.dt.year
@@ -49,6 +64,7 @@ class TwitterBot:
 
         self.tzinfo = pytz.timezone("Europe/Warsaw")
         self.today = pd.Timestamp(datetime.today())
+        logging.info("init complete")
 
     def _au(
         self, bearer_token, api_key, api_secret, access_token, access_token_secret
@@ -74,15 +90,20 @@ class TwitterBot:
             tuple[Client, API]: stuff needed make tweets
         """
 
+        logging.info("authenicating...")
         bearer_token = keys.BEARER_TOKEN
         api_key = keys.API_KEY
         access_token = keys.ACCESS_TOKEN
         access_token_secret = keys.ACCESS_TOKEN_SECRET
         api_secret = keys.API_SECRET
 
-        client, api = self._au(
-            bearer_token, api_key, api_secret, access_token, access_token_secret
-        )
+        try:
+            client, api = self._au(
+                bearer_token, api_key, api_secret, access_token, access_token_secret
+            )
+        except Exception as e:
+            logging.exception("auth failed", e)
+            exit(1)
 
         return client, api
 
@@ -453,7 +474,7 @@ class TwitterBot:
                 xref="paper",
                 yref="paper",
                 x=0.5,
-                pad=dict(t=100, b=100)
+                pad=dict(t=100, b=100),
             ),
             paper_bgcolor="#1a1a1a",
             colorway=["#d11635", "#AC1B26", "#7F151D", "#3B6323", "#518A30", "#66B13C"],
@@ -583,13 +604,16 @@ class TwitterBot:
 
         make calculations, heatmaps and post them to twitter
         """
-        
+        logging.info("running main function")
         # post daily heatmap
         if self.is_trading_day():
+            logging.info("posting daily heatmap")
             path, tweet_string = self.heatmap_daily_returns()
             self.make_tweet(tweet_string, [path])
+            logging.info("tweeted successfully")
 
 
 if __name__ == "__main__":
+    logging.info("starting...")
     bot = TwitterBot()
     bot.run()
