@@ -577,7 +577,17 @@ class TwitterBot:
     def heatmap_yearly_returns(self):
         raise NotImplementedError
 
-    def run(self): ...
+    def run(self):
+        """
+        run twitter bot
+
+        make calculations, heatmaps and post them to twitter
+        """
+        
+        # post daily heatmap
+        if self.is_trading_day():
+            path, tweet_string = self.heatmap_daily_returns()
+            self.make_tweet(tweet_string, [path])
 
 
 if __name__ == "__main__":
