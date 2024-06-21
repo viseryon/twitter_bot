@@ -123,9 +123,9 @@ class TwitterBot:
 
         start_date = datetime.today() - timedelta(days=365)
 
-        prices = tickers.history(start=start_date, timeout=20)
-        prices = prices.Close
+        prices: pd.DataFrame = tickers.history(start=start_date, timeout=20).Close
         prices.columns = [tick.removesuffix(".WA") for tick in prices.columns]
+        prices = prices.ffill()
 
         wig = prices.WIG
         prices = prices.drop(columns=["WIG"])
@@ -420,6 +420,7 @@ class TwitterBot:
             color="returns",
             color_continuous_scale=["#CC0000", "#292929", "#00CC00"],
             custom_data=data[["returns", "company", "ticker", "curr_prices", "sector"]],
+            range_color=(-1.0, 1.0),
         )
 
         fig.update_traces(
@@ -430,7 +431,7 @@ class TwitterBot:
             marker=dict(
                 cornerradius=25,
                 line_width=3,
-                line_color="#444444",
+                line_color="#2e2e2e",
             ),
         )
 
