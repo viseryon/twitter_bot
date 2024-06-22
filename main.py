@@ -430,7 +430,7 @@ class TwitterBot:
 
         Args:
             data (pd.DataFrame): data to calculate sectors returns
-            wig_return (float): 
+            wig_return (float):
             period (str): period to go to the tweet title
 
         Returns:
@@ -471,7 +471,9 @@ class TwitterBot:
 
         return tweet_text
 
-    def _prepare_data_for_heatmap_and_tweet(self, period: str) -> tuple[pd.DataFrame, float]:
+    def _prepare_data_for_heatmap_and_tweet(
+        self, period: str
+    ) -> tuple[pd.DataFrame, float]:
 
         # calculate returns
         indicies = self.get_periods_indicies(period)
@@ -625,7 +627,7 @@ class TwitterBot:
         # post daily heatmap
         if self.is_trading_day():
             logging.info("posting daily heatmap")
-            path, tweet_string = self.heatmap_and_tweet_text('1D')
+            path, tweet_string = self.heatmap_and_tweet_text("1D")
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
 
