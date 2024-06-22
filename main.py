@@ -420,6 +420,57 @@ class TwitterBot:
             return True
         return False
 
+    def _prepare_tweet_text(
+        self, data: pd.DataFrame, wig_return: float, period: str
+    ) -> str:
+        """
+        prepare text for the tweet
+
+        method for calculating data that will be on the tweet
+
+        Args:
+            data (pd.DataFrame): data to calculate sectors returns
+            wig_return (float): 
+            period (str): period to go to the tweet title
+
+        Returns:
+            str: text to directly put on the tweet
+        """
+        
+        data["contribution"] = data.mkt_cap * data.returns
+
+        sectors_return = (
+            data.groupby("sector")["contribution"].sum()
+            / data.groupby("sector")["mkt_cap"].sum()
+        ).sort_values(ascending=False)
+
+        tweet_text = f"WIG Index {period} perf: {wig_return:.2%}"
+
+        if wig_return > 0.02:
+            tweet_text += " 🟢🟢🟢\n"
+        elif wig_return > 0.01:
+            tweet_text += " 🟢🟢\n"
+        elif wig_return > 0.005:
+            tweet_text += " 🟢\n"
+        elif wig_return > -0.005:
+            tweet_text += " ➖\n"
+        elif wig_return > -0.01:
+            tweet_text += " 🔴\n"
+        elif wig_return > -0.02:
+            tweet_text += " 🔴🔴\n"
+        else:
+            tweet_text += " 🔴🔴🔴\n"
+
+        tweet_text += f"\n🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}\n🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}\n\n"
+
+        for i, (sector, change) in enumerate(sectors_return.items(), start=1):
+            if i < 4:
+                tweet_text += f"{i}. {sector} -> {change:.2%}\n"
+            else:
+                break
+
+        return tweet_text
+
     ### performance heatmaps
 
     def make_heatmap(self, data: pd.DataFrame, path: str, period: str) -> None:
@@ -554,37 +605,8 @@ class TwitterBot:
         path = "wig_heatmap_1d.png"
         self.make_heatmap(data, path, "1D")
 
-        # building text for the tweet
-        data["contribution"] = data.mkt_cap * data.returns
-        sectors_return = (
-            data.groupby("sector")["contribution"].sum()
-            / data.groupby("sector")["mkt_cap"].sum()
-        ).sort_values(ascending=False)
-
-        tweet_text = f"\nWIG Index 1D performance: {wig_return:.2%}"
-
-        if wig_return > 0.02:
-            tweet_text += " 🟢🟢🟢\n"
-        elif wig_return > 0.01:
-            tweet_text += " 🟢🟢\n"
-        elif wig_return > 0.005:
-            tweet_text += " 🟢\n"
-        elif wig_return > -0.005:
-            tweet_text += " ➖\n"
-        elif wig_return > -0.01:
-            tweet_text += " 🔴\n"
-        elif wig_return > -0.02:
-            tweet_text += " 🔴🔴\n"
-        else:
-            tweet_text += " 🔴🔴🔴\n"
-
-        tweet_text += f"\n🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}\n🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}\n\n"
-
-        for i, (sector, change) in enumerate(sectors_return.items(), start=1):
-            if i < 4:
-                tweet_text += f"{i}. {sector} -> {change:.2%}\n"
-            else:
-                break
+        # text for the tweet
+        tweet_text = self._prepare_tweet_text(data, wig_return, period="1D")
 
         return (path, tweet_text)
 
