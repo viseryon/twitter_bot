@@ -144,7 +144,9 @@ class TwitterBot:
 
         start_date = datetime.today() - timedelta(days=365)
 
-        prices: pd.DataFrame = tickers.history(start=start_date, timeout=20).Close
+        prices: pd.DataFrame = tickers.history(
+            start=start_date, timeout=20, progress=False, threads=False
+        ).Close
         prices.columns = [tick.removesuffix(".WA") for tick in prices.columns]
         prices = prices.ffill()
 
