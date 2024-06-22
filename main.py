@@ -350,14 +350,14 @@ class TwitterBot:
         full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(".WA")
         return full_components
 
-    def get_periods_indicies(self, period="day") -> Index:
+    def get_periods_indicies(self, period="1D") -> Index:
         """
         get a start date and last date of some period to calculate returns
 
-        possible periods: ytd, qtd, mtd, week, day, year
+        possible periods: YTD, QTD, MTD, 1W, 1D, 1Y
 
         Args:
-            period (str, optional): what period the changes will be calculated. Defaults to "day".
+            period (str, optional): what period the changes will be calculated. Defaults to "1D".
 
         Raises:
             NotImplementedError
@@ -366,13 +366,13 @@ class TwitterBot:
             Index: index to use with df.iloc
         """
 
-        if period == "ytd":
+        if period == "YTD":
             return (
                 self.ts.loc[self.ts[self.ts.year == self.today.year - 1].index.max() :]
                 .iloc[[0, -1]]
                 .index
             )
-        elif period == "mtd":
+        elif period == "MTD":
             return (
                 self.ts.iloc[
                     self.ts[
@@ -384,7 +384,7 @@ class TwitterBot:
                 .iloc[[0, -1]]
                 .index
             )
-        elif period == "qtd":
+        elif period == "QTD":
             return (
                 self.ts.iloc[
                     self.ts[
@@ -396,7 +396,7 @@ class TwitterBot:
                 .iloc[[0, -1]]
                 .index
             )
-        elif period == "week":  # remember to do this on weekends!
+        elif period == "1W":  # remember to do this on weekends!
             return (
                 self.ts.iloc[
                     self.ts[
@@ -408,9 +408,9 @@ class TwitterBot:
                 .iloc[[0, -1]]
                 .index
             )
-        elif period == "day":
+        elif period == "1D":
             return self.ts.iloc[[-2, -1]].index
-        elif period == "year":
+        elif period == "1Y":
             return self.ts.iloc[self.ts.index.max() - 252 :].iloc[[0, -1]].index
         else:
             raise NotImplementedError(f"period {period} not available")
@@ -436,7 +436,7 @@ class TwitterBot:
         Returns:
             str: text to directly put on the tweet
         """
-        
+
         data["contribution"] = data.mkt_cap * data.returns
 
         sectors_return = (
@@ -471,9 +471,44 @@ class TwitterBot:
 
         return tweet_text
 
+    def _prepare_data_for_heatmap_and_tweet(self, period: str) -> tuple[pd.DataFrame, float]:
+
+        # calculate returns
+        indicies = self.get_periods_indicies(period)
+        data: pd.DataFrame = self.prices.iloc[indicies].pct_change().dropna().T
+        data.columns = ["returns"]
+
+        # calculate wig returns
+        wig_return: float = self.wig.iloc[indicies].pct_change().values[0]
+
+        data = pd.merge(
+            self.wig_components.set_index("ticker"),
+            data,
+            right_index=True,
+            left_index=True,
+            validate="one_to_one",
+        )
+        # data.columns
+        # ['company', 'ISIN', 'yf_ticker', 'sector', 'industry', 'shares_num', 'returns']
+
+        data = data.drop(columns=["ISIN", "yf_ticker"])
+        data["curr_prices"] = self.curr_prices
+
+        data["mkt_cap"] = data["curr_prices"] * data["shares_num"]
+        data = (
+            data.reset_index()
+            .rename({"index": "ticker"}, axis=1)
+            .sort_values("returns", ascending=False)
+        )
+
+        # data.columns
+        # 'ticker', 'company', 'sector', 'industry', 'shares_num', 'returns', 'curr_prices', 'mkt_cap'
+
+        return data, wig_return
+
     ### performance heatmaps
 
-    def make_heatmap(self, data: pd.DataFrame, path: str, period: str) -> None:
+    def chart_heatmap(self, data: pd.DataFrame, path: str, period: str) -> None:
         """
         saves wig heatmap
 
@@ -562,65 +597,23 @@ class TwitterBot:
 
         fig.write_image(path)
 
-    def heatmap_daily_returns(self) -> tuple[str, str]:
+    def heatmap_and_tweet_text(self, period) -> tuple[str, str]:
         """
-        method for creating wig heatmap for 1d performance
-
         calculates necessary data and prepares heatmap and text for the tweet
 
         Returns:
             tuple[str, str]: path to picture and tweet text
         """
 
-        # calculate daily returns
-        indicies = self.get_periods_indicies("day")
-        data: pd.DataFrame = self.prices.iloc[indicies].pct_change().dropna().T
-        data.columns = ["returns"]
+        data, wig_return = self._prepare_data_for_heatmap_and_tweet(period=period)
 
-        wig_return: float = self.wig.iloc[indicies].pct_change().values[0]
-
-        data = pd.merge(
-            self.wig_components.set_index("ticker"),
-            data,
-            right_index=True,
-            left_index=True,
-            validate="one_to_one",
-        )
-        # data.columns
-        # ['company', 'ISIN', 'yf_ticker', 'sector', 'industry', 'shares_num', 'returns']
-
-        data = data.drop(columns=["ISIN", "yf_ticker"])
-        data["curr_prices"] = self.curr_prices
-
-        data["mkt_cap"] = data["curr_prices"] * data["shares_num"]
-        data = (
-            data.reset_index()
-            .rename({"index": "ticker"}, axis=1)
-            .sort_values("returns", ascending=False)
-        )
-
-        # data.columns
-        # 'ticker', 'company', 'sector', 'industry', 'shares_num', 'returns', 'curr_prices', 'mkt_cap'
-
-        path = "wig_heatmap_1d.png"
-        self.make_heatmap(data, path, "1D")
+        path = f"wig_heatmap_{period}.png"
+        self.chart_heatmap(data, path, period)
 
         # text for the tweet
-        tweet_text = self._prepare_tweet_text(data, wig_return, period="1D")
+        tweet_text = self._prepare_tweet_text(data, wig_return, period=period)
 
         return (path, tweet_text)
-
-    def heatmap_weekly_returns(self):
-        raise NotImplementedError
-
-    def heatmap_monthly_returns(self):
-        raise NotImplementedError
-
-    def heatmap_quarterly_returns(self):
-        raise NotImplementedError
-
-    def heatmap_yearly_returns(self):
-        raise NotImplementedError
 
     def run(self):
         """
@@ -632,7 +625,7 @@ class TwitterBot:
         # post daily heatmap
         if self.is_trading_day():
             logging.info("posting daily heatmap")
-            path, tweet_string = self.heatmap_daily_returns()
+            path, tweet_string = self.heatmap_and_tweet_text('1D')
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
 
