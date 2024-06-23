@@ -657,8 +657,15 @@ class TwitterBot:
 
         # on last day of the quarter post 1q performance
         if self.today.is_quarter_end:
-            logging.info("posting monthly heatmap")
+            logging.info("posting quarterly heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("QTD")
+            self.make_tweet(tweet_string, [path])
+            logging.info("tweeted successfully")
+
+        # on last day of the year post 1y performance
+        if self.today.is_year_end:
+            logging.info("posting yearly heatmap")
+            path, tweet_string = self.heatmap_and_tweet_text("YTD")
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
 
