@@ -576,7 +576,6 @@ class TwitterBot:
                 pad=dict(t=100, b=100),
             ),
             paper_bgcolor="#1a1a1a",
-            colorway=["#d11635", "#AC1B26", "#7F151D", "#3B6323", "#518A30", "#66B13C"],
         )
 
         fig.add_annotation(
