@@ -524,6 +524,15 @@ class TwitterBot:
 
         font = "Segoe UI"
 
+        if period == "1W":
+            additional_info = f"⁕ {self.today.week}W{self.today.year}"
+        elif period == 'MTD':
+            additional_info = f"⁕ {self.today.month}M{self.today.year}"
+        elif period == 'QTD':
+            additional_info = f"⁕ {self.today.quarter}Q{self.today.year}"
+        else:   # 1D, YTD, 1Y
+            additional_info = ""
+
         fig = px.treemap(
             data,
             path=["sector", "ticker"],
@@ -557,7 +566,7 @@ class TwitterBot:
             width=7680,
             height=4320,
             title=dict(
-                text=f"INDEX WIG<br><sup>{period} performance ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}</sup>",
+                text=f"INDEX WIG<br><sup>{period} performance {additional_info} ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}</sup>",
                 font=dict(color="white", size=170, family=font),
                 yanchor="middle",
                 xanchor="center",
@@ -617,17 +626,39 @@ class TwitterBot:
 
         return (path, tweet_text)
 
-    def run(self):
+    def run(self) -> None:
         """
         run twitter bot
 
         make calculations, heatmaps and post them to twitter
         """
         logging.info("running main function")
+
         # post daily heatmap
         if self.is_trading_day():
             logging.info("posting daily heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("1D")
+            self.make_tweet(tweet_string, [path])
+            logging.info("tweeted successfully")
+
+        # on saturday post 1w performance
+        if self.today.weekday() == 6:
+            logging.info("posting weekly heatmap")
+            path, tweet_string = self.heatmap_and_tweet_text("1W")
+            self.make_tweet(tweet_string, [path])
+            logging.info("tweeted successfully")
+
+        # on last day of the month post 1m performance
+        if self.today.is_month_end:
+            logging.info("posting monthly heatmap")
+            path, tweet_string = self.heatmap_and_tweet_text("MTD")
+            self.make_tweet(tweet_string, [path])
+            logging.info("tweeted successfully")
+
+        # on last day of the quarter post 1q performance
+        if self.today.is_quarter_end:
+            logging.info("posting monthly heatmap")
+            path, tweet_string = self.heatmap_and_tweet_text("QTD")
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
 
