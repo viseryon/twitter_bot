@@ -530,6 +530,16 @@ class TwitterBot:
         else:  # 1D, YTD, 1Y
             additional_info = ""
 
+        # colour bounds for different periods
+        bounds = {
+            "1D": 0.03,
+            "1W": 0.1,
+            "MTD": 0.2,
+            "QTD": 0.3,
+            "YTD": 0.5,
+            "1Y": 0.5,
+        }
+
         fig = px.treemap(
             data,
             path=["sector", "ticker"],
@@ -553,8 +563,8 @@ class TwitterBot:
 
         fig.update_coloraxes(
             showscale=True,
-            cmin=-0.03,
-            cmax=0.03,
+            cmin=-bounds[period],
+            cmax=bounds[period],
             cmid=0,
         )
 
