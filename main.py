@@ -407,6 +407,12 @@ class TwitterBot:
             raise NotImplementedError(f"period {period} not available")
 
     def is_trading_day(self) -> bool:
+        """
+        checks if today was a trading day by looking at dates in downloaded data
+
+        Returns:
+            bool
+        """
         if pd.Timestamp(datetime.today().date()) in self.ts.Date.to_list():
             return True
         return False
