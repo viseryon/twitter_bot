@@ -9,7 +9,6 @@ import plotly.express as px
 import pytz
 import yahooquery as yq
 import yfinance as yf
-from matplotlib import pyplot as plt
 from pandas import Index
 from tweepy import API, Client, OAuth1UserHandler
 
@@ -21,7 +20,6 @@ script running my twitter bot
 it includes TwitterBot class that will run bot that posts pictures with WIG returns
 """
 
-plt.style.use("dark_background")
 
 os.chdir(Path(__file__).parent)
 
@@ -66,25 +64,11 @@ class TwitterBot:
         self.today = pd.Timestamp(datetime.today())
         logging.info("init complete")
 
-    def _au(
-        self, bearer_token, api_key, api_secret, access_token, access_token_secret
-    ) -> tuple[Client, API]:
-        """auth with tweepy"""
-
-        client = Client(
-            bearer_token, api_key, api_secret, access_token, access_token_secret
-        )
-
-        auth = OAuth1UserHandler(api_key, api_secret, access_token, access_token_secret)
-        api = API(auth, retry_count=5, retry_delay=5, retry_errors=set([503]))
-        # https://stackoverflow.com/questions/48117126/when-using-tweepy-cursor-what-is-the-best-practice-for-catching-over-capacity-e
-        return client, api
-
     def auth(self) -> tuple[Client, API]:
         """
         auth method
 
-        reads from keys all the necessary secrets
+        reads from keys all the necessary secrets and performs auth with tweepy
 
         Returns:
             tuple[Client, API]: stuff needed make tweets
@@ -98,9 +82,14 @@ class TwitterBot:
         api_secret = keys.API_SECRET
 
         try:
-            client, api = self._au(
+            # https://stackoverflow.com/questions/48117126/when-using-tweepy-cursor-what-is-the-best-practice-for-catching-over-capacity-e
+            client = Client(
                 bearer_token, api_key, api_secret, access_token, access_token_secret
             )
+            auth = OAuth1UserHandler(
+                api_key, api_secret, access_token, access_token_secret
+            )
+            api = API(auth, retry_count=5, retry_delay=5, retry_errors=set([503]))
         except Exception as e:
             logging.exception("auth failed", e)
             exit(1)
@@ -528,11 +517,11 @@ class TwitterBot:
 
         if period == "1W":
             additional_info = f"⁕ {self.today.week}W{self.today.year}"
-        elif period == 'MTD':
+        elif period == "MTD":
             additional_info = f"⁕ {self.today.month}M{self.today.year}"
-        elif period == 'QTD':
+        elif period == "QTD":
             additional_info = f"⁕ {self.today.quarter}Q{self.today.year}"
-        else:   # 1D, YTD, 1Y
+        else:  # 1D, YTD, 1Y
             additional_info = ""
 
         fig = px.treemap(
