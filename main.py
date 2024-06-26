@@ -319,14 +319,12 @@ class TwitterBot:
             ) in empty_data.iterrows():
                 print(f"Company {company} had missing data.")
 
-                if isinstance(ticker, np.NaN):
+                if ticker is np.NaN:
                     # add missing ticker
                     new_symbol = self.get_symbol(company)
                     full_components.loc[indx, "yf_ticker"] = new_symbol
-                else:
-                    new_symbol = full_components.loc[indx, "yf_ticker"]
 
-                if isinstance(sector, np.NaN) or isinstance(industry, np.NaN):
+                if sector is np.NaN or industry is np.NaN:
                     # add missing sector and industry values
                     asset_profile = yq.Ticker(new_symbol).asset_profile[new_symbol]
                     full_components.loc[indx, "sector"] = asset_profile["sector"]
