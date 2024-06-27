@@ -520,11 +520,11 @@ class TwitterBot:
         font = "Times New Roman"
 
         if period == "1W":
-            additional_info = f"⁕ {self.today.week}W{self.today.year}"
+            additional_info = f" ⁕ {self.today.week}W{self.today.year}"
         elif period == "MTD":
-            additional_info = f"⁕ {self.today.month}M{self.today.year}"
+            additional_info = f" ⁕ {self.today.month}M{self.today.year}"
         elif period == "QTD":
-            additional_info = f"⁕ {self.today.quarter}Q{self.today.year}"
+            additional_info = f" ⁕ {self.today.quarter}Q{self.today.year}"
         else:  # 1D, YTD, 1Y
             additional_info = ""
 
@@ -578,7 +578,7 @@ class TwitterBot:
             width=7680,
             height=4320,
             title=dict(
-                text=f"INDEX WIG<br><sup>{period} performance {additional_info} ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}</sup>",
+                text=f"INDEX WIG<br><sup>{period} performance{additional_info} ⁕ {datetime.now(self.tzinfo):%Y/%m/%d}</sup>",
                 font=dict(color="white", size=170, family=font),
                 yanchor="middle",
                 xanchor="center",
