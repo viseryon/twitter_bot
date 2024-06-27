@@ -517,7 +517,7 @@ class TwitterBot:
             period (str): used only for title
         """
 
-        font = "Segoe UI"
+        font = "Times New Roman"
 
         if period == "1W":
             additional_info = f"⁕ {self.today.week}W{self.today.year}"
@@ -564,6 +564,13 @@ class TwitterBot:
             cmin=-bounds[period],
             cmax=bounds[period],
             cmid=0,
+            colorbar=dict(
+                title_text="",
+                thickness=175,
+                orientation="h",
+                y=1.03,
+                ticks=''
+            ),
         )
 
         fig.update_layout(
