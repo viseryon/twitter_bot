@@ -492,6 +492,7 @@ class TwitterBot:
         data["curr_prices"] = self.curr_prices
 
         data["mkt_cap"] = data["curr_prices"] * data["shares_num"]
+        data['WIG'] = 'WIG'
         data = (
             data.reset_index()
             .rename({"index": "ticker"}, axis=1)
@@ -540,7 +541,7 @@ class TwitterBot:
 
         fig = px.treemap(
             data,
-            path=["sector", "ticker"],
+            path=['WIG', "sector", "ticker"],
             values="mkt_cap",
             color="returns",
             color_continuous_scale=["#CC0000", "#292929", "#00CC00"],
