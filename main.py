@@ -456,7 +456,11 @@ class TwitterBot:
         else:
             tweet_text += " 🔴🔴🔴\n"
 
-        tweet_text += f"\n🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}\n🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}\n\n"
+        tweet_text += f"""
+        🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}
+        🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}
+
+"""
 
         for i, (sector, change) in enumerate(sectors_return.items(), start=1):
             if i < 4:
