@@ -145,9 +145,7 @@ class TwitterBot:
         return prices, wig
 
     @staticmethod
-    def get_symbol(
-        query: str, preferred_exchange: str = "WSE", max_tries=5, **kwargs
-    ) -> str:
+    def get_symbol(query: str, preferred_exchange: str = "WSE", max_tries=5, **kwargs) -> str:
         """
         get ticker
 
@@ -415,9 +413,7 @@ class TwitterBot:
             return True
         return False
 
-    def _prepare_tweet_text(
-        self, data: pd.DataFrame, wig_return: float, period: str
-    ) -> str:
+    def _prepare_tweet_text(self, data: pd.DataFrame, wig_return: float, period: str) -> str:
         """
         prepare text for the tweet
 
@@ -470,9 +466,7 @@ class TwitterBot:
 
         return tweet_text
 
-    def _prepare_data_for_heatmap_and_tweet(
-        self, period: str
-    ) -> tuple[pd.DataFrame, float]:
+    def _prepare_data_for_heatmap_and_tweet(self, period: str) -> tuple[pd.DataFrame, float]:
 
         # calculate returns
         indicies = self.get_periods_indicies(period)
