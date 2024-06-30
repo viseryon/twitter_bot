@@ -654,7 +654,7 @@ class TwitterBot:
             logging.info("tweeted successfully")
 
         # on saturday post 1w performance
-        if self.today.weekday() == 5:
+        if self.today.weekday() == 6:
             logging.info("posting weekly heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("1W")
             self.make_tweet(tweet_string, [path])
