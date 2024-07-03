@@ -2,6 +2,7 @@ import logging
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
+from http.client import IncompleteRead
 
 import numpy as np
 import pandas as pd
@@ -195,7 +196,7 @@ class TwitterBot:
                 updated_components = pd.read_html(
                     "https://gpwbenchmark.pl/ajaxindex.php?action=GPWIndexes&start=ajaxPortfolio&format=html&lang=EN&isin=PL9999999995&cmng_id=1011&time=1718378430237"
                 )[0]
-            except ValueError as e:
+            except IncompleteRead as e:
                 tries += 1
                 logging.error(e + f"\n{tries = }")
             else:  # if downloading data worked
