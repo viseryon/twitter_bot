@@ -187,7 +187,7 @@ class TwitterBot:
                     break
             return symbol
 
-    def _get_wig_components(self, retry: int = 5) -> pd.DataFrame:
+    def _get_wig_components(self, retry: int = 10) -> pd.DataFrame:
 
         # get data from source
         tries = 0
