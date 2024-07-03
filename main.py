@@ -186,12 +186,23 @@ class TwitterBot:
                     break
             return symbol
 
-    def _get_wig_components(self) -> pd.DataFrame:
+    def _get_wig_components(self, retry: int = 5) -> pd.DataFrame:
 
         # get data from source
-        updated_components = pd.read_html(
-            "https://gpwbenchmark.pl/ajaxindex.php?action=GPWIndexes&start=ajaxPortfolio&format=html&lang=EN&isin=PL9999999995&cmng_id=1011&time=1718378430237"
-        )[0]
+        tries = 0
+        while tries < retry:
+            try:
+                updated_components = pd.read_html(
+                    "https://gpwbenchmark.pl/ajaxindex.php?action=GPWIndexes&start=ajaxPortfolio&format=html&lang=EN&isin=PL9999999995&cmng_id=1011&time=1718378430237"
+                )[0]
+            except ValueError as e:
+                tries += 1
+                logging.error(e + f"\n{tries = }")
+            else:  # if downloading data worked
+                break
+        else:   # downloading data failed every time
+            logging.error(f'downloading wig components failed {retry} times')
+            exit(1)
 
         updated_components = updated_components.iloc[:, :3]
         updated_components.columns = ["company", "ISIN", "shares_num"]
