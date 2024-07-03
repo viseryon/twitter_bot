@@ -446,21 +446,22 @@ class TwitterBot:
             / data.groupby("sector")["mkt_cap"].sum()
         ).sort_values(ascending=False)
 
-        tweet_text = f"WIG Index {period} perf: {wig_return:.2%}"
+        tweet_text = f"WIG Index {period} perf" #: {wig_return:.2%}"
 
-        if wig_return > 0.02:
-            tweet_text += " 🟢🟢🟢\n"
-        elif wig_return > 0.01:
-            tweet_text += " 🟢🟢\n"
-        elif wig_return > 0.005:
-            tweet_text += " 🟢\n"
-        elif wig_return > -0.005:
-            tweet_text += " ➖\n"
-        elif wig_return > -0.01:
-            tweet_text += " 🔴\n"
-        elif wig_return > -0.02:
-            tweet_text += " 🔴🔴\n"
-        else:
+        # add this when yahoo finance provides wig index data
+        # if wig_return > 0.02:
+        #     tweet_text += " 🟢🟢🟢\n"
+        # elif wig_return > 0.01:
+        #     tweet_text += " 🟢🟢\n"
+        # elif wig_return > 0.005:
+        #     tweet_text += " 🟢\n"
+        # elif wig_return > -0.005:
+        #     tweet_text += " ➖\n"
+        # elif wig_return > -0.01:
+        #     tweet_text += " 🔴\n"
+        # elif wig_return > -0.02:
+        #     tweet_text += " 🔴🔴\n"
+        # else:
             tweet_text += " 🔴🔴🔴\n"
 
         tweet_text += f"""
