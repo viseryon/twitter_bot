@@ -1,8 +1,8 @@
 import logging
 import os
 from datetime import datetime, timedelta
-from pathlib import Path
 from http.client import IncompleteRead
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -198,7 +198,7 @@ class TwitterBot:
                 )[0]
             except IncompleteRead as e:
                 tries += 1
-                logging.error(e + f"\n{tries = }")
+                logging.error(e)
             else:  # if downloading data worked
                 break
         else:   # downloading data failed every time
@@ -463,7 +463,7 @@ class TwitterBot:
         # elif wig_return > -0.02:
         #     tweet_text += " 🔴🔴\n"
         # else:
-            tweet_text += " 🔴🔴🔴\n"
+        # tweet_text += " 🔴🔴🔴\n"
 
         tweet_text += f"""
         🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}
