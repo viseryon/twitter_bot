@@ -580,8 +580,15 @@ class TwitterBot:
                 title_text="",
                 thickness=175,
                 orientation="h",
-                y=1.03,
-                ticks=''
+                y=1.035,
+                tickfont=dict(
+                    color="white",
+                    size=125,
+                    family=font,
+                ),
+                ticklabelposition="inside",
+                tickvals=[-bounds[period] * 0.95, bounds[period] * 0.95],
+                ticktext=[f"{-bounds[period]:.0%}", f"{bounds[period]:.0%}"],
             ),
         )
 
