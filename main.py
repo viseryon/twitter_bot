@@ -467,8 +467,7 @@ class TwitterBot:
 
         tweet_text += f"""
 🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}
-🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}
-
+🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}\n
 """
 
         for i, (sector, change) in enumerate(sectors_return.items(), start=1):
@@ -476,6 +475,8 @@ class TwitterBot:
                 tweet_text += f"{i}. {sector} -> {change:.2%}\n"
             else:
                 break
+
+        tweet_text += "\n#WIG #GPW #giełda #inwestycje #akcje"
 
         return tweet_text
 
