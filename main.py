@@ -485,7 +485,13 @@ class TwitterBot:
         # calculate returns
         indicies = self.get_periods_indicies(period)
         data: pd.DataFrame = self.prices.iloc[indicies].pct_change().dropna().T
-        data.columns = ["returns"]
+        try:
+            data.columns = ["returns"]
+        except ValueError as e:
+            logging.error(e)
+            logging.error(data)
+            logging.error(self.prices)
+            exit(1)
 
         # calculate wig returns
         wig_return: float = self.wig.iloc[indicies].pct_change().values[0]
