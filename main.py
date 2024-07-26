@@ -84,12 +84,8 @@ class TwitterBot:
 
         try:
             # https://stackoverflow.com/questions/48117126/when-using-tweepy-cursor-what-is-the-best-practice-for-catching-over-capacity-e
-            client = Client(
-                bearer_token, api_key, api_secret, access_token, access_token_secret
-            )
-            auth = OAuth1UserHandler(
-                api_key, api_secret, access_token, access_token_secret
-            )
+            client = Client(bearer_token, api_key, api_secret, access_token, access_token_secret)
+            auth = OAuth1UserHandler(api_key, api_secret, access_token, access_token_secret)
             api = API(auth, retry_count=5, retry_delay=5, retry_errors=set([503]))
         except Exception as e:
             logging.exception("auth failed", e)
@@ -166,9 +162,7 @@ class TwitterBot:
             print(query)
             tries = kwargs.get("tries", 0)
             if tries >= max_tries:
-                raise ValueError(
-                    f"YahooFinance have not returned the necessary ticker\n{query = }"
-                )
+                raise ValueError(f"YahooFinance have not returned the necessary ticker\n{query = }")
             return TwitterBot.get_symbol(query, tries=tries + 1)
         else:
             quotes = data["quotes"]
@@ -201,8 +195,8 @@ class TwitterBot:
                 logging.error(e)
             else:  # if downloading data worked
                 break
-        else:   # downloading data failed every time
-            logging.error(f'downloading wig components failed {retry} times')
+        else:  # downloading data failed every time
+            logging.error(f"downloading wig components failed {retry} times")
             exit(1)
 
         updated_components = updated_components.iloc[:, :3]
@@ -313,9 +307,7 @@ class TwitterBot:
         # check for empty data
         empty_data = full_components[full_components.isnull().any(axis=1)]
         if empty_data.empty:
-            full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(
-                ".WA"
-            )
+            full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(".WA")
             full_components.industry = full_components.industry.replace(pretty_industry)
             return full_components
         else:  # get new ticker from Yahoo Finance
@@ -341,9 +333,7 @@ class TwitterBot:
                     full_components.loc[indx, "industry"] = asset_profile["industry"]
 
             # save new csv with full WIG
-            full_components.drop(columns="shares_num").to_csv(
-                "wig_comps.csv", index=False
-            )
+            full_components.drop(columns="shares_num").to_csv("wig_comps.csv", index=False)
 
         full_components.industry = full_components.industry.replace(pretty_industry)
         full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(".WA")
@@ -375,8 +365,7 @@ class TwitterBot:
             return (
                 self.ts.iloc[
                     self.ts[
-                        (self.ts.year == self.today.year)
-                        & (self.ts.month == self.today.month)
+                        (self.ts.year == self.today.year) & (self.ts.month == self.today.month)
                     ].index.min()
                     - 1 :
                 ]
@@ -387,8 +376,7 @@ class TwitterBot:
             return (
                 self.ts.iloc[
                     self.ts[
-                        (self.ts.year == self.today.year)
-                        & (self.ts.quarter == self.today.quarter)
+                        (self.ts.year == self.today.year) & (self.ts.quarter == self.today.quarter)
                     ].index.min()
                     - 1 :
                 ]
@@ -399,8 +387,7 @@ class TwitterBot:
             return (
                 self.ts.iloc[
                     self.ts[
-                        (self.ts.year == self.today.year)
-                        & (self.ts.week == self.today.week)
+                        (self.ts.year == self.today.year) & (self.ts.week == self.today.week)
                     ].index.min()
                     - 1 :
                 ]
@@ -443,11 +430,10 @@ class TwitterBot:
         data["contribution"] = data.mkt_cap * data.returns
 
         sectors_return = (
-            data.groupby("sector")["contribution"].sum()
-            / data.groupby("sector")["mkt_cap"].sum()
+            data.groupby("sector")["contribution"].sum() / data.groupby("sector")["mkt_cap"].sum()
         ).sort_values(ascending=False)
 
-        tweet_text = f"WIG Index {period} performance\n" #: {wig_return:.2%}"
+        tweet_text = f"WIG Index {period} performance\n"  #: {wig_return:.2%}"
 
         # add this when yahoo finance provides wig index data
         # if wig_return > 0.02:
@@ -470,7 +456,9 @@ class TwitterBot:
 🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}\n
 """
 
-        for medal, (i, (sector, change)) in zip(('🥇','🥈','🥉'), enumerate(sectors_return.items(), start=1)):
+        for medal, (i, (sector, change)) in zip(
+            ("🥇", "🥈", "🥉"), enumerate(sectors_return.items(), start=1)
+        ):
             if i < 4:
                 tweet_text += f"{medal}\t{sector} -> {change:.2%}\n"
             else:
@@ -510,7 +498,7 @@ class TwitterBot:
         data["curr_prices"] = self.curr_prices
 
         data["mkt_cap"] = data["curr_prices"] * data["shares_num"]
-        data['WIG'] = 'WIG'
+        data["WIG"] = "WIG"
         data = (
             data.reset_index()
             .rename({"index": "ticker"}, axis=1)
@@ -559,7 +547,7 @@ class TwitterBot:
 
         fig = px.treemap(
             data,
-            path=['WIG', "sector", "ticker"],
+            path=["WIG", "sector", "ticker"],
             values="mkt_cap",
             color="returns",
             color_continuous_scale=["#CC0000", "#292929", "#00CC00"],
