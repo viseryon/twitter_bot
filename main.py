@@ -470,9 +470,9 @@ class TwitterBot:
 🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}\n
 """
 
-        for i, (sector, change) in enumerate(sectors_return.items(), start=1):
+        for medal, (i, (sector, change)) in zip(('🥇','🥈','🥉'), enumerate(sectors_return.items(), start=1)):
             if i < 4:
-                tweet_text += f"{i}. {sector} -> {change:.2%}\n"
+                tweet_text += f"{medal}\t{sector} -> {change:.2%}\n"
             else:
                 break
 
