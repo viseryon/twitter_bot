@@ -181,14 +181,14 @@ class TwitterBot:
                     break
             return symbol
 
-    def _get_wig_components(self, retry: int = 10) -> pd.DataFrame:
+    def _get_wig_components(self, retry: int = 20) -> pd.DataFrame:
 
         # get data from source
         tries = 0
         while tries < retry:
             try:
                 updated_components = pd.read_html(
-                    "https://gpwbenchmark.pl/ajaxindex.php?action=GPWIndexes&start=ajaxPortfolio&format=html&lang=EN&isin=PL9999999995&cmng_id=1011&time=1718378430237"
+                    "https://gpwbenchmark.pl/ajaxindex.php?action=GPWIndexes&start=ajaxPortfolio&format=html&lang=EN&isin=PL9999999995&cmng_id=1011"
                 )[0]
             except IncompleteRead as e:
                 tries += 1
