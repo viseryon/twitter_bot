@@ -472,7 +472,7 @@ class TwitterBot:
 
         # calculate returns
         indicies = self.get_periods_indicies(period)
-        data: pd.DataFrame = self.prices.iloc[indicies].pct_change().dropna().T
+        data: pd.DataFrame = self.prices.iloc[indicies].pct_change().T.iloc[:, [-1]]
         try:
             data.columns = ["returns"]
         except ValueError as e:
