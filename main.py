@@ -695,10 +695,9 @@ class TwitterBot:
             logging.info("tweeted successfully")
 
         # choose randomly a day to post ytd performance
-        # 18 out of 360, so on average every 20 days
-        odds = set(range(18))
-        rng = np.random.choice(list(range(360)))
-        if rng in odds:
+        # 24 out of 360, so on average every 15 days
+        rng = np.random.randint(0, 360)
+        if rng < 24:
             logging.info("posting ytd heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("YTD")
             self.make_tweet(tweet_string, [path])
