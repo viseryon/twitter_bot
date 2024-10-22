@@ -513,6 +513,11 @@ class TwitterBot:
         # data.columns
         # 'ticker', 'company', 'sector', 'industry', 'shares_num', 'returns', 'curr_prices', 'mkt_cap'
 
+        # check for nans in dataframe
+        if data.isnull().any().any():
+            logging.error('THERE ARE NULL VALUES IN DATAFRAME WITH PRICES')
+            logging.error(data[data.isnull().any(axis=1)])
+            
         return data, wig_return
 
     ### performance heatmaps
