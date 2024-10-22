@@ -136,6 +136,12 @@ class TwitterBot:
         prices.columns = [tick.removesuffix(".WA") for tick in prices.columns]
         prices = prices.ffill()
 
+        # after using ffill to fill values when there was no price change
+        # during the trading session
+        # bfill fills values before the first occurance
+        # this provide an anchor value to calculate longer period
+        prices = prices.bfill()
+
         wig = prices.WIG
         prices = prices.drop(columns=["WIG"])
 
