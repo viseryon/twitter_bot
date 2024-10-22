@@ -26,7 +26,6 @@ os.chdir(Path(__file__).parent)
 
 logging.basicConfig(
     level=logging.INFO,
-    # filename="app.log",
     format="%(asctime)s - %(levelname)s - %(funcName)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
