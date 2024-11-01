@@ -319,23 +319,25 @@ class TwitterBot:
             for indx, (
                 company,
                 isin,
-                ticker,
+                yf_ticker,
                 sector,
                 industry,
                 shares_num,
             ) in empty_data.iterrows():
                 print(f"Company {company} had missing data.")
-
-                if ticker is np.NaN:
+                
+                if np.isnan(yf_ticker):
+                    ticker = self.get_symbol(isin)
                     # add missing ticker
-                    new_symbol = self.get_symbol(company)
-                    full_components.loc[indx, "yf_ticker"] = new_symbol
+                    full_components.loc[indx, "yf_ticker"] = ticker # type: ignore
+                else:
+                    ticker = yf_ticker
 
-                if sector is np.NaN or industry is np.NaN:
+                if np.isnan(sector) or np.isnan(industry):
                     # add missing sector and industry values
-                    asset_profile = yq.Ticker(new_symbol).asset_profile[new_symbol]
-                    full_components.loc[indx, "sector"] = asset_profile["sector"]
-                    full_components.loc[indx, "industry"] = asset_profile["industry"]
+                    asset_profile = yq.Ticker(ticker).asset_profile[ticker]
+                    full_components.loc[indx, "sector"] = asset_profile["sector"] # type: ignore
+                    full_components.loc[indx, "industry"] = asset_profile["industry"] # type: ignore
 
             # save new csv with full WIG
             full_components.drop(columns="shares_num").to_csv("wig_comps.csv", index=False)
