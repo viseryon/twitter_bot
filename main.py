@@ -324,7 +324,7 @@ class TwitterBot:
                 industry,
                 shares_num,
             ) in empty_data.iterrows():
-                print(f"Company {company} had missing data.")
+                logging.warning(f"Company {company} had missing data.")
                 
                 if np.isnan(yf_ticker):
                     ticker = self.get_symbol(isin)
