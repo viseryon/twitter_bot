@@ -325,19 +325,27 @@ class TwitterBot:
                 shares_num,
             ) in empty_data.iterrows():
                 logging.warning(f"Company {company} had missing data.")
-                
+
                 if pd.isna(yf_ticker):
                     ticker = self.get_symbol(isin)
                     # add missing ticker
-                    full_components.loc[indx, "yf_ticker"] = ticker # type: ignore
+                    full_components.loc[indx, "yf_ticker"] = ticker  # type: ignore
                 else:
                     ticker = yf_ticker
 
                 if pd.isna(sector) or pd.isna(industry):
                     # add missing sector and industry values
                     asset_profile = yq.Ticker(ticker).asset_profile[ticker]
-                    full_components.loc[indx, "sector"] = asset_profile["sector"] # type: ignore
-                    full_components.loc[indx, "industry"] = asset_profile["industry"] # type: ignore
+
+                    # check for correct data returned
+                    # new companies may have no sector/industry data
+                    if not isinstance(asset_profile, dict):
+                        full_components.loc[indx, "sector"] = 'Unclassified'  # type: ignore
+                        full_components.loc[indx, "industry"] = 'Unclassified'  # type: ignore
+                        logging.warning(f"{ticker}'s sector and industry were set to Unclassifed!")
+                    else:
+                        full_components.loc[indx, "sector"] = asset_profile["sector"]  # type: ignore
+                        full_components.loc[indx, "industry"] = asset_profile["industry"]  # type: ignore
 
             # save new csv with full WIG
             full_components.drop(columns="shares_num").to_csv("wig_comps.csv", index=False)
@@ -517,9 +525,9 @@ class TwitterBot:
 
         # check for nans in dataframe
         if data.isnull().any().any():
-            logging.error('THERE ARE NULL VALUES IN DATAFRAME WITH PRICES')
+            logging.error("THERE ARE NULL VALUES IN DATAFRAME WITH PRICES")
             logging.error(data[data.isnull().any(axis=1)])
-            
+
         return data, wig_return
 
     ### performance heatmaps
