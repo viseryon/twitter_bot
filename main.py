@@ -127,7 +127,8 @@ class TwitterBot:
 
         tickers = yf.Tickers(self.tickers + ["WIG.WA"])
 
-        start_date = datetime.today() - timedelta(days=365)
+        # request more than one year to ensure there will be at least one datapoint from the previous year
+        start_date = datetime.today() - timedelta(days=400) 
 
         prices: pd.DataFrame = tickers.history(
             start=start_date, timeout=20, progress=False, threads=False, auto_adjust=False
@@ -726,4 +727,6 @@ class TwitterBot:
 if __name__ == "__main__":
     logging.info("starting...")
     bot = TwitterBot()
-    bot.run()
+    # bot.run()
+    path, tweet_string = bot.heatmap_and_tweet_text("YTD")
+    bot.make_tweet(tweet_string, [path])
