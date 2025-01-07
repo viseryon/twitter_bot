@@ -61,6 +61,9 @@ class TwitterBot:
         self.api: API = api
         logging.info("auth complete")
 
+        self.tzinfo = pytz.timezone("Europe/Warsaw")
+        self.today = pd.Timestamp(datetime.now(tz=self.tzinfo).today())
+
         wig_components = self._get_wig_components()
         self.wig_components: pd.DataFrame = wig_components
         self.tickers: list = wig_components.yf_ticker.to_list()
@@ -79,8 +82,6 @@ class TwitterBot:
         ts["weekday"] = ts.Date.dt.weekday
         self.ts: pd.DataFrame = ts
 
-        self.tzinfo = pytz.timezone("Europe/Warsaw")
-        self.today = pd.Timestamp(datetime.now(tz=self.tzinfo).today())
         logging.info("init complete")
 
     def auth(self) -> tuple[Client, API]:
@@ -489,7 +490,7 @@ class TwitterBot:
         # tweet_text += " 🔴🔴🔴\n"
 
         tweet_text += (
-            f"\n🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}"
+            f"\n🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}\n"
             f"🔴 {data.ticker.iloc[-1]} {data.company.iloc[-1]} {data.returns.iloc[-1]:.2%}\n"
         )
 
@@ -703,6 +704,8 @@ class TwitterBot:
             path, tweet_string = self.heatmap_and_tweet_text("1D")
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
+        else:
+            logging.info("today was not a trading day")
 
         saturday_in_week = 5
         # on saturday post 1w performance
@@ -711,6 +714,8 @@ class TwitterBot:
             path, tweet_string = self.heatmap_and_tweet_text("1W")
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
+        else:
+            logging.info("not posting weekly heatmap")
 
         # on last day of the month post 1m performance
         if self.today.is_month_end:
@@ -718,6 +723,8 @@ class TwitterBot:
             path, tweet_string = self.heatmap_and_tweet_text("MTD")
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
+        else:
+            logging.info("not posting monthly heatmap")
 
         # on last day of the quarter post 1q performance
         if self.today.is_quarter_end:
@@ -725,6 +732,8 @@ class TwitterBot:
             path, tweet_string = self.heatmap_and_tweet_text("QTD")
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
+        else:
+            logging.info("not posting quarterly heatmap")
 
         # on last day of the year post 1y performance
         if self.today.is_year_end:
@@ -732,6 +741,8 @@ class TwitterBot:
             path, tweet_string = self.heatmap_and_tweet_text("YTD")
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
+        else:
+            logging.info("not posting yearly heatmap")
 
         # choose randomly a day to post ytd performance
         # 24 out of 360, so on average every 15 days
@@ -741,6 +752,8 @@ class TwitterBot:
             path, tweet_string = self.heatmap_and_tweet_text("YTD")
             self.make_tweet(tweet_string, [path])
             logging.info("tweeted successfully")
+        else:
+            logging.info("not posting ytd heatmap")
 
 
 if __name__ == "__main__":
