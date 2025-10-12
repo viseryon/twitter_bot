@@ -3,7 +3,7 @@
 Script includes TwitterBot class that will run bot that posts pictures with WIG returns.
 """
 
-import logging
+import json
 import os
 import sys
 from datetime import datetime, timedelta
@@ -15,23 +15,17 @@ import pandas as pd
 import plotly.express as px
 import pytz
 import yahooquery as yq
-import yfinance as yf
+from dotenv import load_dotenv
 from pandas import Index
 from tweepy import API, Client, OAuth1UserHandler
 
-import keys
+from mylogging import setup
+
+load_dotenv()
 
 os.chdir(Path(__file__).parent)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(funcName)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    handlers=[
-        logging.FileHandler("app.log"),
-        logging.StreamHandler(),
-    ],
-)
+logger = setup(__name__)
 
 
 class TwitterBot:
@@ -59,7 +53,7 @@ class TwitterBot:
         client, api = self.auth()
         self.client: Client = client
         self.api: API = api
-        logging.info("auth complete")
+        logger.info("auth complete")
 
         self.tzinfo = pytz.timezone("Europe/Warsaw")
         self.today = pd.Timestamp(datetime.now(tz=self.tzinfo).today())
@@ -67,38 +61,39 @@ class TwitterBot:
         wig_components = self._get_wig_components()
         self.wig_components: pd.DataFrame = wig_components
         self.tickers: list = wig_components.yf_ticker.to_list()
-        logging.info("downloaded wig components")
+        logger.info("downloaded wig components")
 
-        self.prices, self.wig = self._get_data()
+        self.prices = self._get_data()
         self.curr_prices = self.prices.iloc[-1]
-        logging.info("downloaded data")
+        logger.info("downloaded data")
 
         ts = pd.DataFrame(self.prices.index)
-        ts["year"] = ts.Date.dt.year
-        ts["quarter"] = ts.Date.dt.quarter
-        ts["month"] = ts.Date.dt.month
-        ts["week"] = ts.Date.dt.isocalendar().week
-        ts["day"] = ts.Date.dt.day
-        ts["weekday"] = ts.Date.dt.weekday
+        ts["year"] = ts.date.dt.year
+        ts["quarter"] = ts.date.dt.quarter
+        ts["month"] = ts.date.dt.month
+        ts["week"] = ts.date.dt.isocalendar().week
+        ts["day"] = ts.date.dt.day
+        ts["weekday"] = ts.date.dt.weekday
         self.ts: pd.DataFrame = ts
 
-        logging.info("init complete")
+        logger.info("init complete")
 
-    def auth(self) -> tuple[Client, API]:
+    @staticmethod
+    def auth() -> tuple[Client, API]:
         """Auth method.
 
         Reads from keys all the necessary secrets and performs auth with tweepy.
 
         Returns:
-            tuple[Client, API]: stuff needed make tweets
+            tuple[Client, API]: stuff needed to make tweets
 
         """
-        logging.info("authenicating...")
-        bearer_token = keys.BEARER_TOKEN
-        api_key = keys.API_KEY
-        access_token = keys.ACCESS_TOKEN
-        access_token_secret = keys.ACCESS_TOKEN_SECRET
-        api_secret = keys.API_SECRET
+        logger.info("authenicating...")
+        bearer_token = os.environ["BEARER_TOKEN"]
+        api_key = os.environ["API_KEY"]
+        access_token = os.environ["ACCESS_TOKEN"]
+        access_token_secret = os.environ["ACCESS_TOKEN_SECRET"]
+        api_secret = os.environ["API_SECRET"]
 
         try:
             # https://stackoverflow.com/questions/48117126/when-using-tweepy-cursor-what-is-the-best-practice-for-catching-over-capacity-e
@@ -106,7 +101,7 @@ class TwitterBot:
             auth = OAuth1UserHandler(api_key, api_secret, access_token, access_token_secret)
             api = API(auth, retry_count=5, retry_delay=5, retry_errors={503})
         except Exception:
-            logging.exception("auth failed")
+            logger.exception("auth failed")
             sys.exit(1)
 
         return client, api
@@ -133,7 +128,7 @@ class TwitterBot:
         else:
             self.client.create_tweet(text=text)
 
-    def _get_data(self) -> tuple[pd.DataFrame, pd.Series]:
+    def _get_data(self) -> pd.DataFrame:
         """Get data from YahooFinance.
 
         Get pd.DataFrame of prices of selected tickers and transform it.
@@ -142,19 +137,39 @@ class TwitterBot:
             pd.DataFrame: prices with index of dates and columns of stock prices
 
         """
-        tickers = yf.Tickers([*self.tickers, "WIG.WA"])
+        tickers = yq.Ticker(
+            self.tickers,
+            asynchronous=True,
+            max_workers=4,
+            progress=False,
+            timeout=20,
+            validate=True,
+        )
+
+        if tickers.invalid_symbols:
+            logger.warning(
+                "invalid symbols were passed",
+                extra={"invalid_symbols": tickers.invalid_symbols},
+            )
 
         # request more than one year
         # to ensure there will be at least one datapoint from the previous year
         start_date = datetime.now(tz=self.tzinfo).today() - timedelta(days=400)
 
-        prices: pd.DataFrame = tickers.history(
-            start=start_date,
-            timeout=20,
-            progress=False,
-            threads=False,
-            auto_adjust=False,
-        ).Close
+        history = tickers.history(start=start_date, interval="1d")
+
+        if history is None:
+            logger.error("Failed to download price history.")
+            sys.exit(1)
+
+        prices = history.loc[:, ["close"]].pivot_table(
+            index="date",
+            columns="symbol",
+            values="close",
+        )
+
+        prices.index = pd.to_datetime(prices.index)
+
         prices.columns = [tick.removesuffix(".WA") for tick in prices.columns]
         prices = prices.ffill()
 
@@ -162,12 +177,7 @@ class TwitterBot:
         # during the trading session
         # bfill fills values before the first occurance
         # this provide an anchor value to calculate longer period
-        prices = prices.bfill()
-
-        wig = prices.WIG
-        prices = prices.drop(columns=["WIG"])
-
-        return prices, wig
+        return prices.bfill()
 
     @staticmethod
     def get_symbol(
@@ -188,6 +198,9 @@ class TwitterBot:
 
         Returns:
             _type_: _description_
+
+        Raises:
+            ValueError: If YF doesn't return the necessary ticker after max_tries attempts.
 
         """
         try:
@@ -226,13 +239,13 @@ class TwitterBot:
                 break
         else:  # downloading data failed every time
             err = f"downloading wig components failed {retry} times"
-            logging.error(err)
+            logger.error(err)
             sys.exit(1)
 
         updated_components = updated_components.iloc[:, :3]
         updated_components.columns = ["company", "ISIN", "shares_num"]
 
-        saved_components = pd.read_csv("wig_comps.csv")
+        saved_components = pd.read_csv(Path("data", "wig_comps.csv"))
 
         # add tickers to the source data
         full_components = saved_components.merge(
@@ -241,107 +254,16 @@ class TwitterBot:
             on=["company", "ISIN"],
         )
 
-        pretty_industry = {
-            "Financial Data & Stock Exchanges": "Financial Data<br>& Stock Exchanges",
-            "Utilities - Regulated Gas": "Regulated Gas",
-            "Utilities - Independent Power Producers": "Independent<br>Power Producers",
-            "Utilities - Renewable": "Renewable",
-            "Utilities - Regulated Electric": "Regulated Electric",
-            "Real Estate - Diversified": "Diversified",
-            "Real Estate Services": "Services",
-            "Real Estate - Development": "Development",
-            "Farm & Heavy Construction Machinery": "Farm & Heavy<br>Construction Machinery",
-            "Staffing & Employment Services": "Staffing & Employment<br>Services",
-            "Tools & Accessories": "Tools & Accessories",
-            "Building Products & Equipment": "Building Products & Equipment",
-            "Integrated Freight & Logistics": "Integrated Freight & Logistics",
-            "Specialty Industrial Machinery": "Specialty Industrial<br>Machinery",
-            "Electrical Equipment & Parts": "Electrical Equipment & Parts",
-            "Metal Fabrication": "Metal Fabrication",
-            "Aerospace & Defense": "Aerospace & Defense",
-            "Paper & Paper Products": "Paper & Paper Products",
-            "Specialty Chemicals": "Specialty Chemicals",
-            "Specialty Business Services": "Specialty Business<br>Services",
-            "Drug Manufacturers - Specialty & Generic": "Drug Manufacturers<br>Specialty & Generic",
-            "Medical Care Facilities": "Medical Care<br>Facilities",
-            "Medical Instruments & Supplies": "Medical Instruments<br>& Supplies",
-            "Pharmaceutical Retailers": "Pharmaceutical<br>Retailers",
-            "Electronic Components": "Electronic Components",
-            "Scientific & Technical Instruments": "Scientific & Technical<br>Instruments",
-            "Electronics & Computer Distribution": "Electronics & Computer<br>Distribution",
-            "Furnishings, Fixtures & Appliances": "Furnishings,<br>Fixtures & Appliances",
-            "Travel Services": "Travel Services",
-            "Information Technology Services": "Information Technology<br>Services",
-            "Software - Infrastructure": "Infrastructure",
-            "Medical Devices": "Medical Devices",
-            "Banks - Regional": "Banks - Regional",
-            "Oil & Gas Integrated": "Integrated",
-            "Insurance - Property & Casualty": "Property & Casualty",
-            "Internet Retail": "Internet Retail",
-            "Apparel Manufacturing": "Apparel Manufacturing",
-            "Copper": "Copper",
-            "Grocery Stores": "Grocery Stores",
-            "Electronic Gaming & Multimedia": "Electronic<br>Gaming & Multimedia",
-            "Engineering & Construction": "Engineering & Construction",
-            "Aluminum": "Aluminum",
-            "Credit Services": "Credit Services",
-            "Banks - Diversified": "Banks - Diversified",
-            "Apparel Retail": "Apparel Retail",
-            "Leisure": "Leisure",
-            "Telecom Services": "Telecom Services",
-            "Auto Parts": "Auto Parts",
-            "Capital Markets": "Capital Markets",
-            "Software - Application": "Application",
-            "Discount Stores": "Discount Stores",
-            "Entertainment": "Entertainment",
-            "Coking Coal": "Coking Coal",
-            "Medical Distribution": "Medical Distribution",
-            "Restaurants": "Restaurants",
-            "Agricultural Inputs": "Agricultural Inputs",
-            "Diagnostics & Research": "Diagnostics & Research",
-            "Waste Management": "Waste Management",
-            "Biotechnology": "Biotechnology",
-            "Oil & Gas Refining & Marketing": "Refining & Marketing",
-            "Railroads": "Railroads",
-            "Airlines": "Airlines",
-            "Residential Construction": "Residential<br>Construction",
-            "Publishing": "Publishing",
-            "Steel": "Steel",
-            "Thermal Coal": "Thermal Coal",
-            "Confectioners": "Confectioners",
-            "Packaged Foods": "Packaged Foods",
-            "Specialty Retail": "Specialty Retail",
-            "Chemicals": "Chemicals",
-            "Beverages - Wineries & Distilleries": "Wineries & Distilleries",
-            "Asset Management": "Asset Management",
-            "Infrastructure Operations": "Infrastructure<br>Operations",
-            "Conglomerates": "Conglomerates",
-            "Farm Products": "Farm Products",
-            "Security & Protection Services": "Security & Protection<br>Services",
-            "Solar": "Solar",
-            "Computer Hardware": "Computer Hardware",
-            "Broadcasting": "Broadcasting",
-            "Rental & Leasing Services": "Rental & Leasing<br>Services",
-            "Industrial Distribution": "Industrial<br>Distribution",
-            "Advertising Agencies": "Advertising<br>Agencies",
-            "Household & Personal Products": "Household & Personal<br>Products",
-            "Building Materials": "Building Materials",
-            "Food Distribution": "Food Distribution",
-            "Trucking": "Trucking",
-            "Beverages - Non-Alcoholic": "Non-Alcoholic",
-            "Footwear & Accessories": "Footwear & Accessories",
-            "Consulting Services": "Consulting Services",
-            "Communication Equipment": "Communication<br>Equipment",
-            "Internet Content & Information": "Internet<br>Content & Information",
-            "Lumber & Wood Production": "Lumber & Wood<br>Production",
-            "Insurance - Diversified": "Diversified",
-        }
+        with Path("data", "industries.json").open("r", encoding="utf-8") as f:
+            pretty_industry = json.load(f)
+
         # check for empty data
         empty_data = full_components[full_components.isna().any(axis=1)]
         if empty_data.empty:
             full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(".WA")
             full_components.industry = full_components.industry.replace(pretty_industry)
             return full_components
+
         # get new ticker from Yahoo Finance
         for indx, (
             company,
@@ -352,12 +274,13 @@ class TwitterBot:
             _,
         ) in empty_data.iterrows():
             warn = f"Company {company} had missing data."
-            logging.warning(warn)
+            logger.warning(warn)
 
             if pd.isna(yf_ticker):
                 ticker = self.get_symbol(isin)
                 # add missing ticker
-                full_components.loc[indx, "yf_ticker"] = ticker  # type: ignore
+                # use list-based .loc assignment to match pandas-stubs typing
+                full_components.loc[[indx], ["yf_ticker"]] = [ticker]
             else:
                 ticker = yf_ticker
 
@@ -368,14 +291,18 @@ class TwitterBot:
                 # check for correct data returned
                 # new companies may have no sector/industry data
                 if not isinstance(asset_profile, dict):
-                    full_components.loc[indx, "sector"] = None  # type: ignore
-                    full_components.loc[indx, "industry"] = None  # type: ignore
+                    full_components.loc[[indx], ["sector", "industry"]] = [None, None]
                 else:
-                    full_components.loc[indx, "sector"] = asset_profile["sector"]  # type: ignore
-                    full_components.loc[indx, "industry"] = asset_profile["industry"]  # type: ignore
+                    full_components.loc[[indx], ["sector", "industry"]] = [
+                        asset_profile["sector"],
+                        asset_profile["industry"],
+                    ]
 
         # save new csv with full WIG
-        full_components.drop(columns="shares_num").to_csv("wig_comps.csv", index=False)
+        full_components.drop(columns="shares_num").to_csv(
+            Path("data", "wig_comps.csv"),
+            index=False,
+        )
 
         full_components.industry = full_components.industry.replace(pretty_industry)
         full_components["ticker"] = full_components["yf_ticker"].str.removesuffix(".WA")
@@ -451,14 +378,14 @@ class TwitterBot:
         """
         return pd.Timestamp(datetime.now(tz=self.tzinfo).date()) in self.ts.Date.to_list()
 
-    def _prepare_tweet_text(self, data: pd.DataFrame, wig_return: float, period: str) -> str:
+    @staticmethod
+    def _prepare_tweet_text(data: pd.DataFrame, period: str) -> str:
         """Prepare text for the tweet.
 
         Method for calculating data that will be on the tweet.
 
         Args:
             data (pd.DataFrame): data to calculate sectors returns
-            wig_return (float): value of WIG index return
             period (str): period to go to the tweet title
 
         Returns:
@@ -471,23 +398,7 @@ class TwitterBot:
             data.groupby("sector")["contribution"].sum() / data.groupby("sector")["mkt_cap"].sum()
         ).sort_values(ascending=False)
 
-        tweet_text = f"WIG Index {period} performance\n"  #: {wig_return:.2%}"
-
-        # add this when yahoo finance provides wig index data
-        # if wig_return > 0.02:
-        #     tweet_text += " 🟢🟢🟢\n"
-        # elif wig_return > 0.01:
-        #     tweet_text += " 🟢🟢\n"
-        # elif wig_return > 0.005:
-        #     tweet_text += " 🟢\n"
-        # elif wig_return > -0.005:
-        #     tweet_text += " ➖\n"
-        # elif wig_return > -0.01:
-        #     tweet_text += " 🔴\n"
-        # elif wig_return > -0.02:
-        #     tweet_text += " 🔴🔴\n"
-        # else:
-        # tweet_text += " 🔴🔴🔴\n"
+        tweet_text = f"WIG Index {period} performance\n"
 
         tweet_text += (
             f"\n🟢 {data.ticker.iloc[0]} {data.company.iloc[0]} {data.returns.iloc[0]:.2%}\n"
@@ -498,6 +409,7 @@ class TwitterBot:
         for medal, (i, (sector, change)) in zip(
             ("🥇", "🥈", "🥉"),
             enumerate(sectors_return.items(), start=1),
+            strict=False,
         ):
             if i <= max_lines:
                 tweet_text += f"{medal}\t{sector} -> {change:.2%}\n"
@@ -508,19 +420,16 @@ class TwitterBot:
 
         return tweet_text
 
-    def _prepare_data_for_heatmap_and_tweet(self, period: str) -> tuple[pd.DataFrame, float]:
+    def _prepare_data_for_heatmap_and_tweet(self, period: str) -> pd.DataFrame:
         # calculate returns
         indicies = self.get_periods_indicies(period)
         data: pd.DataFrame = self.prices.iloc[indicies].pct_change().T.iloc[:, [-1]]
         try:
             data.columns = ["returns"]
         except ValueError:
-            logging.exception(data)
-            logging.exception(self.prices)
+            logger.exception(data)
+            logger.exception(self.prices)
             sys.exit(1)
-
-        # calculate wig returns
-        wig_return: float = self.wig.iloc[indicies].pct_change().values[0]
 
         data = data.merge(
             self.wig_components.set_index("ticker"),
@@ -544,12 +453,12 @@ class TwitterBot:
 
         # check for nans in dataframe
         if data.isna().any().any():
-            logging.error("THERE ARE NULL VALUES IN DATAFRAME WITH PRICES")
-            logging.error(data[data.isna().any(axis=1)])
+            logger.error("THERE ARE NULL VALUES IN DATAFRAME WITH PRICES")
+            logger.error(data[data.isna().any(axis=1)])
 
-        return data, wig_return
+        return data
 
-    ### performance heatmaps
+    # performance heatmaps
 
     def chart_heatmap(self, data: pd.DataFrame, path: str, period: str) -> None:
         """Save wig heatmap.
@@ -681,13 +590,13 @@ class TwitterBot:
             tuple[str, str]: path to picture and tweet text
 
         """
-        data, wig_return = self._prepare_data_for_heatmap_and_tweet(period=period)
+        data = self._prepare_data_for_heatmap_and_tweet(period=period)
 
         path = f"wig_heatmap_{period}.png"
         self.chart_heatmap(data, path, period)
 
         # text for the tweet
-        tweet_text = self._prepare_tweet_text(data, wig_return, period=period)
+        tweet_text = self._prepare_tweet_text(data, period=period)
 
         return (path, tweet_text)
 
@@ -696,67 +605,67 @@ class TwitterBot:
 
         Make calculations, heatmaps and post them to twitter.
         """
-        logging.info("running main function")
+        logger.info("running main function")
 
         # post daily heatmap
         if self.is_trading_day():
-            logging.info("posting daily heatmap")
+            logger.info("posting daily heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("1D")
             self.make_tweet(tweet_string, [path])
-            logging.info("tweeted successfully")
+            logger.info("tweeted successfully")
         else:
-            logging.info("today was not a trading day")
+            logger.info("today was not a trading day")
 
         saturday_in_week = 5
         # on saturday post 1w performance
         if self.today.weekday() == saturday_in_week:
-            logging.info("posting weekly heatmap")
+            logger.info("posting weekly heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("1W")
             self.make_tweet(tweet_string, [path])
-            logging.info("tweeted successfully")
+            logger.info("tweeted successfully")
         else:
-            logging.info("not posting weekly heatmap")
+            logger.info("not posting weekly heatmap")
 
         # on last day of the month post 1m performance
         if self.today.is_month_end:
-            logging.info("posting monthly heatmap")
+            logger.info("posting monthly heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("MTD")
             self.make_tweet(tweet_string, [path])
-            logging.info("tweeted successfully")
+            logger.info("tweeted successfully")
         else:
-            logging.info("not posting monthly heatmap")
+            logger.info("not posting monthly heatmap")
 
         # on last day of the quarter post 1q performance
         if self.today.is_quarter_end:
-            logging.info("posting quarterly heatmap")
+            logger.info("posting quarterly heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("QTD")
             self.make_tweet(tweet_string, [path])
-            logging.info("tweeted successfully")
+            logger.info("tweeted successfully")
         else:
-            logging.info("not posting quarterly heatmap")
+            logger.info("not posting quarterly heatmap")
 
         # on last day of the year post 1y performance
         if self.today.is_year_end:
-            logging.info("posting yearly heatmap")
+            logger.info("posting yearly heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("YTD")
             self.make_tweet(tweet_string, [path])
-            logging.info("tweeted successfully")
+            logger.info("tweeted successfully")
         else:
-            logging.info("not posting yearly heatmap")
+            logger.info("not posting yearly heatmap")
 
         # choose randomly a day to post ytd performance
         # 24 out of 360, so on average every 15 days
         rng = np.random.default_rng()
         if rng.random() < 24 / 360:
-            logging.info("posting ytd heatmap")
+            logger.info("posting ytd heatmap")
             path, tweet_string = self.heatmap_and_tweet_text("YTD")
             self.make_tweet(tweet_string, [path])
-            logging.info("tweeted successfully")
+            logger.info("tweeted successfully")
         else:
-            logging.info("not posting ytd heatmap")
+            logger.info("not posting ytd heatmap")
 
 
 if __name__ == "__main__":
-    logging.info("starting...")
+    logger.info("starting...")
     bot = TwitterBot()
     bot.run()
