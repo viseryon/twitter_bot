@@ -376,7 +376,7 @@ class TwitterBot:
             bool
 
         """
-        return pd.Timestamp(datetime.now(tz=self.tzinfo).date()) in self.ts.Date.to_list()
+        return pd.Timestamp(datetime.now(tz=self.tzinfo).date()) in self.ts.date.to_list()
 
     @staticmethod
     def _prepare_tweet_text(data: pd.DataFrame, period: str) -> str:
