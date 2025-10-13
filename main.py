@@ -162,7 +162,17 @@ class TwitterBot:
             logger.error("Failed to download price history.")
             sys.exit(1)
 
-        prices = history.loc[:, ["close"]].pivot_table(
+        # index with dates can have dates or datetimes, which will mess up
+        # comparisons in pivot table
+
+        new_dt_index = pd.to_datetime(history.index.get_level_values("date"), utc=True).date
+
+        history.index = pd.MultiIndex.from_arrays(
+            [history.index.get_level_values("symbol"), new_dt_index],
+            names=["symbol", "date"],
+        )
+
+        prices = history.pivot_table(
             index="date",
             columns="symbol",
             values="close",
