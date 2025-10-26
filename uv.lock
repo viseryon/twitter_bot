@@ -491,7 +491,7 @@ wheels = [
 
 [[package]]
 name = "gpw-heatmaps"
-version = "0.1.0"
+version = "1.0.0"
 source = { virtual = "packages/gpw_heatmaps" }
 dependencies = [
     { name = "kaleido" },
@@ -1126,7 +1126,7 @@ wheels = [
 
 [[package]]
 name = "mylogging"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "packages/mylogging" }
 
 [[package]]
@@ -1586,7 +1586,7 @@ wheels = [
 
 [[package]]
 name = "pricing-term-structure"
-version = "0.1.0"
+version = "1.0.1"
 source = { virtual = "packages/pricing_term_structure" }
 dependencies = [
     { name = "aiofiles" },
@@ -2402,7 +2402,7 @@ wheels = [
 
 [[package]]
 name = "twitter-bot"
-version = "0.1.0"
+version = "1.0.1"
 source = { virtual = "." }
 dependencies = [
     { name = "numpy" },

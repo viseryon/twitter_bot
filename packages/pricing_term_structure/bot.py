@@ -23,6 +23,8 @@ logger = setup(__name__, __file__)
 
 os.chdir(Path(__file__).parent)
 
+plt.style.use("dark_background")
+
 
 class NSShelper:
     def __init__(self):
@@ -86,7 +88,7 @@ class NSShelper:
             try:
                 rate = curve.zeroRate(moved_date, ql.ActualActual(ql.ActualActual.ISMA), ql.Continuous)
             except Exception:
-                logger.exception(
+                logger.debug(
                     "failed to calculate zero-rate",
                     extra={"eval_date": eval_date.isoformat(), "period": period},
                 )
@@ -107,8 +109,8 @@ class NSShelper:
         )
 
     @staticmethod
-    def objective_function(self, initial_guess, df):
-        nss_ = self.nss(initial_guess, df.period)
+    def objective_function(initial_guess, df):
+        nss_ = NSShelper.nss(initial_guess, df.period)
         return ((df.rate - nss_) ** 2).sum()
 
     def calculate_zero_rates(self, data, dates):
@@ -137,8 +139,8 @@ class NSShelper:
         for idx in dates:
             df = zero_rates.loc[idx]
             c = minimize(
-                self.objective_function,
-                [0.01, 0.01, 0.01, 0.01, 1.00, 1.00],
+                fun=self.objective_function,
+                x0=[0.01, 0.01, 0.01, 0.01, 1.00, 1.00],
                 args=(df,),
             )
             vals.append(c)
@@ -157,7 +159,7 @@ class NSShelper:
         months = np.arange(1, 181)
 
         curves = params.apply(self.nss, args=(months,), axis="columns", result_type="expand")
-        curves.columns = months
+        curves.columns = [str(month) for month in months]
 
         full = params.join(curves)
         return full
@@ -364,7 +366,7 @@ class TermStructureBot(TwitterBot):
         logger.info("cheking for new data for nss")
         data_to_do_nss = data.loc[last_nss_date + pd.offsets.Day(1) :]
         dates_to_do_nss = data_to_do_nss.index.get_level_values("Date").unique()
-        if not dates_to_do_nss:
+        if dates_to_do_nss.empty:
             logger.warning("no new data for nss")
             self.nss_curve = nss_data
             return nss_data
@@ -506,13 +508,13 @@ class TermStructureBot(TwitterBot):
             "\U0001f1f5\U0001f1f1 PLN Sovereign curve modelling 📊\n\n"
             "⚖️ Risk-Neutral rates\n"
             + "\n".join([
-                f"{maturity / 12:.0f}y\t{value:.2%}"
+                f"{maturity / 12:.0f}y {value:.2%}"
                 for maturity, value in zip(maturities, list(rny_curr_values), strict=True)
             ])
             + "\n\n"
             "⏳ Term Premium\n"
             + "\n".join([
-                f"{maturity / 12:.0f}y\t{value:.2%}"
+                f"{maturity / 12:.0f}y {value:.2%}"
                 for maturity, value in zip(maturities, list(tp_curr_values), strict=True)
             ])
         )
