@@ -491,7 +491,7 @@ wheels = [
 
 [[package]]
 name = "gpw-heatmaps"
-version = "1.0.0"
+version = "1.0.1"
 source = { virtual = "packages/gpw_heatmaps" }
 dependencies = [
     { name = "kaleido" },

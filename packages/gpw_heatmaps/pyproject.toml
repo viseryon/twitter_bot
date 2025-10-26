@@ -1,6 +1,6 @@
 [project]
 name = "gpw-heatmaps"
-version = "1.0.0"
+version = "1.0.1"
 description = "Project to post heatmaps with gpw stocks"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -1,5 +1,6 @@
 from bot import WIGBot
 
-bot = WIGBot()
+if __name__ == "__main__":
+    bot = WIGBot()
 
-# bot.run()
+    bot.run()
