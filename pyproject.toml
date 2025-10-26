@@ -1,20 +1,22 @@
 [project]
-name = "twitter-bott"
+name = "twitter-bot"
 version = "0.1.0"
-description = "My WIG Twitter Bot"
+description = "My Twitter Bot"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = [
-    "numpy>=2.2.1",
-    "pandas>=2.2.3",
-    "plotly[kaleido]>=6.3.1",
-    "pytz>=2024.2",
-    "requests>=2.32.3",
-    "tweepy>=4.14.0",
-    "yahooquery>=2.4.1",
-    "kaleido>=0.2.1",
-    "python-dotenv>=1.1.1",
-]
+dependencies = ["numpy>=2.2.1", "pandas>=2.2.3", "python-dotenv>=1.1.1"]
 
 [dependency-groups]
 dev = ["ipykernel>=6.30.1"]
+
+[tool.uv.sources]
+mylogging = { workspace = true }
+twitter_bot_base = { workspace = true }
+
+[tool.uv.workspace]
+members = [
+    "packages/gpw_heatmaps",
+    "packages/pricing_term_structure",
+    "packages/mylogging",
+    "packages/twitter_bot_base",
+]

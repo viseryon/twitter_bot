@@ -1,0 +1,12 @@
+{
+    "Nazwa": "Seria",
+    "ISIN": "Kod ISIN",
+    "Cena K": "buy_price",
+    "Cena S": "sell_price",
+    "Rent.K": "buy_yield",
+    "Rent.S": "sell_yield",
+    "Cena fix": "fix_price",
+    "Rent fix": "fix_yield",
+    "date": "Date",
+    "fixing": "Fixing"
+}

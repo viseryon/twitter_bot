@@ -1,0 +1,12 @@
+{
+    "Seria": "string",
+    "Date": "datetime64[ns]",
+    "Kod ISIN": "string",
+    "Fixing": "Int8",
+    "buy_price": "Float32",
+    "sell_price": "Float32",
+    "buy_yield": "Float32",
+    "sell_yield": "Float32",
+    "fix_price": "Float32",
+    "fix_yield": "Float32"
+}
