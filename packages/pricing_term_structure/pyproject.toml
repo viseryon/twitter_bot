@@ -1,6 +1,6 @@
 [project]
 name = "pricing-term-structure"
-version = "1.0.1"
+version = "1.0.2"
 description = "Pricing polish term structure with QuantLib"
 readme = "README.md"
 requires-python = ">=3.11"

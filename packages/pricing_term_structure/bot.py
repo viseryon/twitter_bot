@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import re
+from collections.abc import Iterable
 from datetime import datetime
 from io import StringIO
 from itertools import product
@@ -173,7 +174,7 @@ class TermStructureBot(TwitterBot):
     TITLE_FONT_SIZE = 24
     SUBTITLE_FONT_SIZE = 14
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         self.interest_calendar: pd.DataFrame | None = None
@@ -183,7 +184,7 @@ class TermStructureBot(TwitterBot):
         with Path("config", "request_header.json").open(encoding="utf-8") as f:
             self._request_headers = json.load(f)
 
-    def update_interest_calendar(self):
+    def update_interest_calendar(self) -> pd.DataFrame:
         resp = httpx.get("https://www.gov.pl/web/finanse/kupony")
 
         hash_ = re.search(r'href="/attachment/([\w-]+)"', resp.text).groups()[0]
@@ -244,12 +245,11 @@ class TermStructureBot(TwitterBot):
         async with limiter:
             params = {"date": date, "type": fixing}
             logger.info("making request to bondspot", extra=params)
-            resp = await client.get(
+            return await client.get(
                 self.BONDSPOT_LINK,
                 params=params,
                 headers=self._request_headers,
             )
-            return resp
 
     async def get_bond_prices_data(
         self,
@@ -328,8 +328,8 @@ class TermStructureBot(TwitterBot):
                 axis=1,
             )
             .astype(column_types)
-            .drop(columns=new_data.columns.difference(column_types.keys()))
         )
+        new_data = new_data.drop(columns=new_data.columns.difference(column_types.keys()))
 
         data = pd.concat([current_data, new_data])
         data.to_parquet(Path("data", "bond_prices.parquet"), index=False)
@@ -383,7 +383,15 @@ class TermStructureBot(TwitterBot):
 
         return updated_nss_data
 
-    def calculate_term_structure(self):
+    def update_data(self) -> None:
+        self.update_interest_calendar()
+        self.update_bond_prices()
+        self.update_nss_curve()
+
+    def calculate_term_structure(self, *, update_data: bool = False) -> NominalACM:
+        if update_data:
+            self.update_data()
+
         data = pd.read_parquet(Path("data", "nss_curve.parquet"))
         data = data.drop(columns=["beta0", "beta1", "beta2", "beta3", "tau1", "tau2"])
         data = data.resample("ME").last()
@@ -396,7 +404,7 @@ class TermStructureBot(TwitterBot):
 
         return acm
 
-    def make_risk_neutral_graph(self, acm: NominalACM, maturities=(12, 24, 60, 120)):
+    def make_risk_neutral_graph(self, acm: NominalACM, maturities: Iterable = (12, 24, 60, 120)):
         plt.rcParams["font.family"] = self.FONTNAME
         plt.rcParams["font.weight"] = "bold"
 
@@ -451,7 +459,7 @@ class TermStructureBot(TwitterBot):
 
         return path
 
-    def make_term_premium_graph(self, acm: NominalACM, maturities=(12, 24, 60, 120)):
+    def make_term_premium_graph(self, acm: NominalACM, maturities: Iterable = (12, 24, 60, 120)):
         plt.rcParams["font.family"] = self.FONTNAME
         plt.rcParams["font.weight"] = "bold"
         offset_date = datetime.today() - pd.offsets.YearBegin(4)
@@ -497,7 +505,7 @@ class TermStructureBot(TwitterBot):
 
         return path
 
-    def prepare_tweet(self, acm: NominalACM, maturities=(12, 24, 60, 120)):
+    def prepare_tweet(self, acm: NominalACM, maturities: Iterable = (12, 24, 60, 120)):
         rny = self.make_risk_neutral_graph(acm)
         tp = self.make_term_premium_graph(acm)
 
@@ -521,12 +529,8 @@ class TermStructureBot(TwitterBot):
 
         return text, [rny, tp]
 
-    def run(self):
-        self.update_interest_calendar()
-
-        self.update_bond_prices()
-
-        self.update_nss_curve()
+    def run(self) -> None:
+        self.update_data()
 
         acm = self.calculate_term_structure()
 
