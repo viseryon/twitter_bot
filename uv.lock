@@ -1586,7 +1586,7 @@ wheels = [
 
 [[package]]
 name = "pricing-term-structure"
-version = "1.0.2"
+version = "1.0.3"
 source = { virtual = "packages/pricing_term_structure" }
 dependencies = [
     { name = "aiofiles" },
