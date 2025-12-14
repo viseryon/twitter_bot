@@ -95,7 +95,6 @@ class NSShelper:
                 )
             else:
                 rates.append((rate.rate(), eval_date, moved_date.to_date(), period))
-
         return rates
 
     @staticmethod
@@ -118,7 +117,7 @@ class NSShelper:
         rates = []
 
         for eval_date in dates:
-            bonds = data.loc[eval_date, ["fix_price", "Kupon", "Data wykupu", "Początek okresu"]]
+            bonds = data.loc[eval_date, ["fix_price", "Kupon", "Wykup", "Początek okresu"]]
             curve = self.build_zero_curve_from_bonds(bonds, eval_date)
 
             rate = self.get_zero_rates_from_curve(curve, eval_date)
@@ -185,7 +184,7 @@ class TermStructureBot(TwitterBot):
             self._request_headers = json.load(f)
 
     def update_interest_calendar(self) -> pd.DataFrame:
-        resp = httpx.get("https://www.gov.pl/web/finanse/kupony")
+        resp = httpx.get("https://www.gov.pl/web/finanse/kalkulatory2")
 
         hash_ = re.search(r'href="/attachment/([\w-]+)"', resp.text).groups()[0]
         url = f"https://www.gov.pl/attachment/{hash_}"
@@ -194,29 +193,35 @@ class TermStructureBot(TwitterBot):
             pd.read_excel(
                 url,
                 header=[0, 1],
-                sheet_name="ObligacjeStałoprocentowe",
+                sheet_name="Stałe",
             )
             .rename(
                 columns={
-                    "Unnamed: 0_level_0": "Info",
-                    "Unnamed: 1_level_0": "Info",
-                    "Unnamed: 2_level_0": "Info",
-                    "Unnamed: 3_level_0": "Info",
+                    "Unnamed: 0_level_1": "Info",
+                    "Unnamed: 1_level_1": "Info",
+                    "Unnamed: 2_level_1": "Info",
+                    "Unnamed: 3_level_1": "Info",
                 },
             )
-            .replace({"-": pd.NA})
+            .replace({"-": pd.NA, "": pd.NA})
         )
+
+        # new excel has different first few columns
+        cols_to_swap = [col for col in bond_cal.columns if col[1] == "Info"]
+        tmp_df = bond_cal[cols_to_swap].swaplevel(axis=1)
+        bond_cal = bond_cal.drop(columns=cols_to_swap)
+        bond_cal = pd.concat([tmp_df, bond_cal], axis="columns")
 
         info = bond_cal.Info  # loc[:, ["Info"]].stack(level=0, future_stack=True).reset_index(1, drop=True)
         calendar = (
-            bond_cal.loc[:, [f"Kupon Nr {num}" for num in range(1, 32)]]
+            bond_cal.loc[:, [f"Kupon #{num:0>2}" for num in range(1, 32)]]
             .stack(level=0, future_stack=True)
             .reset_index(1)
             .rename(columns={"level_1": "Numer okresu"})
         )
 
         df = info.join(calendar).dropna(how="any")
-        df["Numer okresu"] = df["Numer okresu"].str[9:]
+        df["Numer okresu"] = df["Numer okresu"].str.removeprefix("Kupon #")
         df = df.astype({
             "Początek okresu": "datetime64[ns]",
             "Koniec okresu": "datetime64[ns]",
@@ -226,6 +231,7 @@ class TermStructureBot(TwitterBot):
             "Numer okresu": "int16",
             "Kod ISIN": "string",
             "Seria": "string",
+            "Wykup": "datetime64[ns]",
         })
 
         path = Path("data", "interest_calendar.parquet")
@@ -339,7 +345,7 @@ class TermStructureBot(TwitterBot):
         logger.info("preparing bond prices data for nss")
         interest_calendar = pd.read_parquet(
             Path("data", "interest_calendar.parquet"),
-            columns=["Seria", "Kod ISIN", "Koniec okresu", "Początek okresu", "Kupon", "Data wykupu"],
+            columns=["Seria", "Kod ISIN", "Koniec okresu", "Początek okresu", "Kupon", "Wykup"],
         )
         ceny_rentownosci = pd.read_parquet(
             Path("data", "bond_prices.parquet"),

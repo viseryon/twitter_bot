@@ -1,6 +1,6 @@
 [project]
 name = "pricing-term-structure"
-version = "1.0.3"
+version = "1.0.4"
 description = "Pricing polish term structure with QuantLib"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -15,6 +15,7 @@ dependencies = [
     "lxml>=6.0.1",
     "matplotlib>=3.10.6",
     "nbconvert>=7.16.6",
+    "openpyxl>=3.1.5",
     "pyacm>=1.0",
     "pyarrow>=21.0.0",
     "quantlib>=1.39",
